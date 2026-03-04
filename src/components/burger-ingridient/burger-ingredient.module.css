@@ -1,0 +1,25 @@
+.burger_ingredient {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  cursor: pointer;
+}
+
+.info {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.price {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+.counter {
+  position: absolute;
+  z-index: 1;
+  align-items: end;
+}
