@@ -1,9 +1,10 @@
+import { useModal } from '@/hooks/useModal';
 import { Tab } from '@krgaa/react-developer-burger-ui-components';
 import { useState, useCallback, useRef } from 'react';
 
 import { BurgerIngredient } from '../burger-ingridient/burger-ingredient';
-import { IngredientDetails } from '../ingredient_detailes/ingredient_detailes';
-import { Modal } from '../Modal/modal';
+import { IngredientDetails } from '../ingredient-detailes/ingredient-detailes';
+import { Modal } from '../modal/modal';
 
 import type { TIngredient } from '@utils/types';
 
@@ -19,10 +20,10 @@ export const BurgerIngredients = ({
   console.log(ingredients);
   const [currentTab, setCurrentTab] = useState('bun');
   const [ingridientCount, setCounts] = useState<Record<string, number>>({});
-  const [showModal, setShowModal] = useState(false);
   const [currentIngredient, setIngredient] = useState<TIngredient | undefined>(
     undefined
   );
+  const { isModalOpen, openModal, closeModal } = useModal();
 
   const bunRef = useRef<HTMLHeadingElement>(null);
   const mainRef = useRef<HTMLHeadingElement>(null);
@@ -41,7 +42,7 @@ export const BurgerIngredients = ({
 
   const handleIngredientClick = useCallback((id: string) => {
     setIngredient(ingredients.find((item) => item._id === id));
-    setShowModal(!showModal);
+    openModal();
     setCounts((prev) => ({
       ...prev,
       [id]: (prev[id] || 0) + 1,
@@ -113,8 +114,9 @@ export const BurgerIngredients = ({
           {renderIngredientsSection(ingredients.filter((item) => item.type === 'sauce'))}
         </section>
       </section>
-      {showModal && (
-        <Modal onClose={() => setShowModal(!showModal)} header={'Детали ингредиента'}>
+
+      {isModalOpen && (
+        <Modal onClose={closeModal} header={'Детали ингредиента'}>
           {<IngredientDetails ingredient={currentIngredient} />}
         </Modal>
       )}

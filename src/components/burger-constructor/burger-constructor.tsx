@@ -1,13 +1,13 @@
+import { useModal } from '@/hooks/useModal';
 import {
   Button,
   ConstructorElement,
   CurrencyIcon,
   DragIcon,
 } from '@krgaa/react-developer-burger-ui-components';
-import { useState } from 'react';
 
-import { Modal } from '../Modal/modal';
-import { OrderDetailes } from '../order_detailes/order_detailes';
+import { Modal } from '../modal/modal';
+import { OrderDetailes } from '../order-detailes/order-detailes';
 
 import type { TIngredient } from '@utils/types';
 
@@ -19,7 +19,7 @@ type TBurgerConstructorProps = {
 export const BurgerConstructor = ({
   ingredients,
 }: TBurgerConstructorProps): React.JSX.Element => {
-  const [showModal, setShowModal] = useState(false);
+  const { isModalOpen, openModal, closeModal } = useModal();
 
   console.log(ingredients);
   const ingredientToDisplay = ingredients.filter((item) => item.type !== 'bun');
@@ -60,22 +60,13 @@ export const BurgerConstructor = ({
         <div className={`${styles.submit_info} mt-10`}>
           <span className="text text_type_digits-default mr-2">610</span>
           <CurrencyIcon type="primary" className="mr-10" />
-          <Button
-            htmlType="submit"
-            size="medium"
-            type="primary"
-            onClick={() => {
-              setShowModal(!showModal);
-            }}
-          >
+          <Button htmlType="submit" size="medium" type="primary" onClick={openModal}>
             Оформить заказ
           </Button>
         </div>
       </section>
-      {showModal && (
-        <Modal onClose={() => setShowModal(!showModal)}>
-          {<OrderDetailes id="034536" />}
-        </Modal>
+      {isModalOpen && (
+        <Modal onClose={closeModal}>{<OrderDetailes id="034536" />}</Modal>
       )}
     </>
   );

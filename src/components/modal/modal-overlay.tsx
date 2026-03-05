@@ -1,4 +1,4 @@
-import styles from './modal.module.css';
+import styles from './modal-overlay.module.css';
 
 type TModalOverlayProps = {
   children: React.ReactNode;
@@ -10,7 +10,7 @@ export const ModalOverlay = ({
   onClick,
 }: TModalOverlayProps): React.JSX.Element => {
   return (
-    <div className={styles.modal_overlay as string} onClick={onClick}>
+    <div className={styles.overlay} onClick={onClick}>
       {children}
     </div>
   );

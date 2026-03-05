@@ -1,6 +1,6 @@
 import { CheckMarkIcon } from '@krgaa/react-developer-burger-ui-components';
 
-import styles from './order_detailes.module.css';
+import styles from './order-detailes.module.css';
 type TOrderDetailesProps = {
   id: string;
 };
