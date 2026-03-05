@@ -2,6 +2,8 @@ import { Tab } from '@krgaa/react-developer-burger-ui-components';
 import { useState, useCallback, useRef } from 'react';
 
 import { BurgerIngredient } from '../burger-ingridient/burger-ingredient';
+import { IngredientDetails } from '../ingredient_detailes/ingredient_detailes';
+import { Modal } from '../Modal/modal';
 
 import type { TIngredient } from '@utils/types';
 
@@ -17,6 +19,10 @@ export const BurgerIngredients = ({
   console.log(ingredients);
   const [currentTab, setCurrentTab] = useState('bun');
   const [ingridientCount, setCounts] = useState<Record<string, number>>({});
+  const [showModal, setShowModal] = useState(false);
+  const [currentIngredient, setIngredient] = useState<TIngredient | undefined>(
+    undefined
+  );
 
   const bunRef = useRef<HTMLHeadingElement>(null);
   const mainRef = useRef<HTMLHeadingElement>(null);
@@ -34,6 +40,8 @@ export const BurgerIngredients = ({
   }, []);
 
   const handleIngredientClick = useCallback((id: string) => {
+    setIngredient(ingredients.find((item) => item._id === id));
+    setShowModal(!showModal);
     setCounts((prev) => ({
       ...prev,
       [id]: (prev[id] || 0) + 1,
@@ -54,55 +62,62 @@ export const BurgerIngredients = ({
   );
 
   return (
-    <section className={styles.burger_ingredients}>
-      <nav>
-        <ul className={styles.menu}>
-          <Tab
-            value="bun"
-            active={currentTab === 'bun'}
-            onClick={() => {
-              /* TODO */
-              handleTabClick('bun');
-            }}
-          >
+    <>
+      <section className={styles.burger_ingredients}>
+        <nav>
+          <ul className={styles.menu}>
+            <Tab
+              value="bun"
+              active={currentTab === 'bun'}
+              onClick={() => {
+                /* TODO */
+                handleTabClick('bun');
+              }}
+            >
+              Булки
+            </Tab>
+            <Tab
+              value="main"
+              active={currentTab === 'main'}
+              onClick={() => {
+                /* TODO */
+                handleTabClick('main');
+              }}
+            >
+              Начинки
+            </Tab>
+            <Tab
+              value="sauce"
+              active={currentTab === 'sauce'}
+              onClick={() => {
+                /* TODO */
+                handleTabClick('sauce');
+              }}
+            >
+              Соусы
+            </Tab>
+          </ul>
+        </nav>
+        <section className={`${styles.burger_ingredients_section} custom-scroll`}>
+          <h2 ref={bunRef} className="text text_type_main-medium mt-10 mb-6">
             Булки
-          </Tab>
-          <Tab
-            value="main"
-            active={currentTab === 'main'}
-            onClick={() => {
-              /* TODO */
-              handleTabClick('main');
-            }}
-          >
+          </h2>
+          {renderIngredientsSection(ingredients.filter((item) => item.type === 'bun'))}
+          <h2 ref={mainRef} className="text text_type_main-medium mt-10 mb-6">
             Начинки
-          </Tab>
-          <Tab
-            value="sauce"
-            active={currentTab === 'sauce'}
-            onClick={() => {
-              /* TODO */
-              handleTabClick('sauce');
-            }}
-          >
+          </h2>
+          {renderIngredientsSection(ingredients.filter((item) => item.type === 'main'))}
+          <h2 ref={sauceRef} className="text text_type_main-medium mt-10 mb-6">
             Соусы
-          </Tab>
-        </ul>
-      </nav>
-      <section className={`${styles.burger_ingredients_section} custom-scroll`}>
-        <h2 ref={bunRef} className="text text_type_main-medium mt-10 mb-6">
-          Булки
-        </h2>
-        {renderIngredientsSection(ingredients.filter((item) => item.type === 'bun'))}
-        <h2 ref={mainRef} className="text text_type_main-medium mt-10 mb-6">
-          Начинки
-        </h2>
-        {renderIngredientsSection(ingredients.filter((item) => item.type === 'main'))}
-        <h2 ref={sauceRef} className="text text_type_main-medium mt-10 mb-6">
-          Соусы
-        </h2>
-        {renderIngredientsSection(ingredients.filter((item) => item.type === 'sauce'))}
+          </h2>
+          {renderIngredientsSection(ingredients.filter((item) => item.type === 'sauce'))}
+        </section>
       </section>
-    </section>
+      {showModal && (
+        <Modal onClose={() => setShowModal(!showModal)} header={'Детали ингредиента'}>
+          {<IngredientDetails ingredient={currentIngredient} />}
+        </Modal>
+      )}
+    </>
   );
 };
