@@ -2,7 +2,7 @@ import { CloseIcon } from '@krgaa/react-developer-burger-ui-components';
 import { useEffect } from 'react';
 import ReactDOM from 'react-dom';
 
-import { ModalOverlay } from './modal-overlay';
+import { ModalOverlay } from './modal_overlay';
 
 import styles from './modal.module.css';
 
@@ -29,11 +29,8 @@ export const Modal = ({ header, children, onClose }: TModalProps): React.JSX.Ele
 
   return ReactDOM.createPortal(
     <ModalOverlay onClick={onClose}>
-      <div
-        className={`${styles.modal} pl-10 pt-10 pr-10 pb-15`}
-        onClick={(e) => e.stopPropagation()}
-      >
-        <div className={styles.modal_top}>
+      <div className={`${styles.modal} pl-10 pt-10 pr-10 pb-15`}>
+        <div className={styles.modal_top as string}>
           <span className="text text_type_main-large">{header}</span>
           <CloseIcon type="primary" onClick={onClose} />
         </div>
