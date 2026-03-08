@@ -29,7 +29,10 @@ export const Modal = ({ header, children, onClose }: TModalProps): React.JSX.Ele
 
   return ReactDOM.createPortal(
     <ModalOverlay onClick={onClose}>
-      <div className={`${styles.modal} pl-10 pt-10 pr-10 pb-15`}>
+      <div
+        className={`${styles.modal} pl-10 pt-10 pr-10 pb-15`}
+        onClick={(e) => e.stopPropagation()}
+      >
         <div className={styles.modal_top}>
           <span className="text text_type_main-large">{header}</span>
           <CloseIcon type="primary" onClick={onClose} />
