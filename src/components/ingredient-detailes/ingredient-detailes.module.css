@@ -1,0 +1,23 @@
+.ingredient {
+  display: flex;
+  flex-direction: column;
+  align-content: center;
+  text-align: center;
+}
+
+.detailed_info {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  list-style-type: none;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  align-content: center;
+  padding: 0;
+}
