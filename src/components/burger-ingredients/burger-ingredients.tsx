@@ -1,6 +1,13 @@
 import { useModal } from '@/hooks/useModal';
+import { useAppSelector } from '@/services/store';
 import { Tab } from '@krgaa/react-developer-burger-ui-components';
 import { useState, useCallback, useRef } from 'react';
+import { useDispatch } from 'react-redux';
+
+import {
+  selectIngredient,
+  clearIngredient,
+} from '@services/selected-ingredient/actions';
 
 import { BurgerIngredient } from '../burger-ingridient/burger-ingredient';
 import { IngredientDetails } from '../ingredient-detailes/ingredient-detailes';
@@ -20,9 +27,14 @@ export const BurgerIngredients = ({
   console.log(ingredients);
   const [currentTab, setCurrentTab] = useState('bun');
   const [ingridientCount, setCounts] = useState<Record<string, number>>({});
-  const [currentIngredient, setIngredient] = useState<TIngredient | undefined>(
-    undefined
+  //const [currentIngredient, setIngredient] = useState<TIngredient | undefined>(
+  //  undefined
+  //);
+  const dispatch = useDispatch();
+  const currentIngredient = useAppSelector(
+    (state) => state.ingredient.selectedIngredient
   );
+
   const { isModalOpen, openModal, closeModal } = useModal();
 
   const bunRef = useRef<HTMLHeadingElement>(null);
@@ -74,13 +86,21 @@ export const BurgerIngredients = ({
   }, [currentTab]);
 
   const handleIngredientClick = useCallback((id: string) => {
-    setIngredient(ingredients.find((item) => item._id === id));
+    const ingredient = ingredients.find((item) => item._id === id);
+    if (ingredient) {
+      dispatch(selectIngredient(ingredient));
+    }
     openModal();
     setCounts((prev) => ({
       ...prev,
       [id]: (prev[id] || 0) + 1,
     }));
   }, []);
+
+  const handleCloseModal = useCallback(() => {
+    closeModal();
+    dispatch(clearIngredient());
+  }, [closeModal, dispatch]);
 
   const renderIngredientsSection = (ingredients: TIngredient[]): React.JSX.Element => (
     <ul className={`${styles.ingredients_tab_content} pl-4 pr-1`}>
@@ -153,7 +173,7 @@ export const BurgerIngredients = ({
       </section>
 
       {isModalOpen && (
-        <Modal onClose={closeModal} header={'Детали ингредиента'}>
+        <Modal onClose={handleCloseModal} header={'Детали ингредиента'}>
           {<IngredientDetails ingredient={currentIngredient} />}
         </Modal>
       )}
