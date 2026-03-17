@@ -27,9 +27,7 @@ export const BurgerIngredients = ({
   console.log(ingredients);
   const [currentTab, setCurrentTab] = useState('bun');
   const [ingridientCount, setCounts] = useState<Record<string, number>>({});
-  //const [currentIngredient, setIngredient] = useState<TIngredient | undefined>(
-  //  undefined
-  //);
+
   const dispatch = useDispatch();
   const currentIngredient = useAppSelector(
     (state) => state.ingredient.selectedIngredient

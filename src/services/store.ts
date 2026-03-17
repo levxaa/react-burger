@@ -1,16 +1,20 @@
-import { configureStore } from '@reduxjs/toolkit';
+import { combineReducers, configureStore } from '@reduxjs/toolkit';
 import { useDispatch, useSelector, type TypedUseSelectorHook } from 'react-redux';
 
-import { ingredientsApi } from './ingredients/api.ts';
-import { ingredientSlice } from './selected-ingredient/reducer.ts';
+import constructorReducer from './burger-constructor/reducer';
+import ingredientsReducer from './ingredients/reducer';
+import orderReducer from './order/reducer';
+import ingredientReducer from './selected-ingredient/reducer';
+
+export const rootReducer = combineReducers({
+  burgerConstructor: constructorReducer,
+  ingredient: ingredientReducer,
+  ingredients: ingredientsReducer,
+  order: orderReducer,
+});
 
 export const store = configureStore({
-  reducer: {
-    [ingredientsApi.reducerPath]: ingredientsApi.reducer,
-    ingredient: ingredientSlice.reducer,
-  },
-  middleware: (getDefaultMiddleware) =>
-    getDefaultMiddleware().concat(ingredientsApi.middleware),
+  reducer: rootReducer,
 });
 
 export type RootState = ReturnType<typeof store.getState>;
