@@ -1,5 +1,5 @@
 import { useModal } from '@/hooks/useModal';
-import { useAppSelector } from '@/services/store';
+import { selectIngredientCounts, useAppSelector } from '@/services/store';
 import { Tab } from '@krgaa/react-developer-burger-ui-components';
 import { useState, useCallback, useRef } from 'react';
 import { useDispatch } from 'react-redux';
@@ -26,7 +26,7 @@ export const BurgerIngredients = ({
 }: TBurgerIngredientsProps): React.JSX.Element => {
   console.log(ingredients);
   const [currentTab, setCurrentTab] = useState('bun');
-  const [ingridientCount, setCounts] = useState<Record<string, number>>({});
+  const ingredientCount = useAppSelector(selectIngredientCounts);
 
   const dispatch = useDispatch();
   const currentIngredient = useAppSelector(
@@ -89,10 +89,6 @@ export const BurgerIngredients = ({
       dispatch(selectIngredient(ingredient));
     }
     openModal();
-    setCounts((prev) => ({
-      ...prev,
-      [id]: (prev[id] || 0) + 1,
-    }));
   }, []);
 
   const handleCloseModal = useCallback(() => {
@@ -106,7 +102,7 @@ export const BurgerIngredients = ({
         <BurgerIngredient
           key={item._id}
           ingredient={item}
-          count={ingridientCount[item._id] || 0}
+          count={ingredientCount[item._id] || 0}
           onClick={() => handleIngredientClick(item._id)}
         />
       ))}
