@@ -1,17 +1,22 @@
-import { setBun, addIngredient } from '@/services/burger-constructor/reducer';
+import {
+  setBun,
+  addIngredient,
+  removeIngredient,
+  moveIngredient,
+} from '@/services/burger-constructor/reducer';
 import { createOrder, clearOrder } from '@/services/order/reducer';
 import {
   Button,
   ConstructorElement,
   CurrencyIcon,
-  DragIcon,
 } from '@krgaa/react-developer-burger-ui-components';
-import { useCallback, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { useDrop } from 'react-dnd';
 
 import { useModal } from '@hooks/useModal';
 import { useAppSelector, useAppDispatch } from '@services/store';
 
+import { DraggableIngredient } from '../draggable-ingredient/draggable-ingredient';
 import { Modal } from '../modal/modal';
 import { OrderDetailes } from '../order-detailes/order-detailes';
 
@@ -38,6 +43,15 @@ export const BurgerConstructor = ({
   );
   const { loading, error } = useAppSelector((state) => state.order);
 
+  const totalPrice = useMemo(() => {
+    const bunPrice = bun ? bun.price * 2 : 0;
+    const ingredientsPrice = constructorIngredients.reduce(
+      (sum, item) => sum + item.price,
+      0
+    );
+    return bunPrice + ingredientsPrice;
+  }, [bun, constructorIngredients]);
+
   const [{ isOver }, dropRef] = useDrop({
     accept: [IngredientType.INGREDIENT, IngredientType.BUN],
     drop: (item: TIngredient) => {
@@ -52,6 +66,7 @@ export const BurgerConstructor = ({
     }),
   });
   console.log(isOver);
+
   const handleOrder = useCallback(() => {
     if (!bun) {
       alert('Выберите булку!');
@@ -80,6 +95,13 @@ export const BurgerConstructor = ({
     setOrderNumber(undefined);
     dispatch(clearOrder());
   }, [closeModal, dispatch]);
+
+  const handleRemoveIngredient = useCallback(
+    (id: string) => {
+      dispatch(removeIngredient(id));
+    },
+    [dispatch]
+  );
 
   const renderIngredientsPlaceholder = (
     type: 'top' | 'bottom' | 'middle',
@@ -111,15 +133,14 @@ export const BurgerConstructor = ({
         </div>
         <ul className={`${styles.list} custom-scroll pl-4`}>
           {constructorIngredients.length > 0
-            ? constructorIngredients.map((item) => (
-                <div className={styles.list_item} key={item.id}>
-                  <DragIcon type="primary" />
-                  <ConstructorElement
-                    text={item.name}
-                    price={item.price}
-                    thumbnail={item.image}
-                  />
-                </div>
+            ? constructorIngredients.map((item, index) => (
+                <DraggableIngredient
+                  key={item.id}
+                  item={item}
+                  index={index}
+                  onRemove={handleRemoveIngredient}
+                  moveIngredient={moveIngredient}
+                />
               ))
             : renderIngredientsPlaceholder('middle', 'Перетаскивайте ингредиенты сюда')}
         </ul>
@@ -137,7 +158,7 @@ export const BurgerConstructor = ({
           )}
         </div>
         <div className={`${styles.submit_info} mt-10`}>
-          <span className="text text_type_digits-default mr-2">610</span>
+          <span className="text text_type_digits-default mr-2">{totalPrice}</span>
           <CurrencyIcon type="primary" className="mr-10" />
           <Button htmlType="submit" size="medium" type="primary" onClick={handleOrder}>
             Оформить заказ

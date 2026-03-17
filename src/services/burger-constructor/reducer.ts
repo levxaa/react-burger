@@ -32,8 +32,20 @@ export const constructorSlice = createSlice({
         id: nanoid(),
       });
     },
+    removeIngredient: (state, action: PayloadAction<string>) => {
+      state.ingredients = state.ingredients.filter((item) => item.id !== action.payload);
+    },
+    moveIngredient: (
+      state,
+      action: PayloadAction<{ fromIndex: number; toIndex: number }>
+    ) => {
+      const { fromIndex, toIndex } = action.payload;
+      const [removed] = state.ingredients.splice(fromIndex, 1);
+      state.ingredients.splice(toIndex, 0, removed);
+    },
   },
 });
 
-export const { setBun, addIngredient } = constructorSlice.actions;
+export const { setBun, addIngredient, removeIngredient, moveIngredient } =
+  constructorSlice.actions;
 export default constructorSlice.reducer;
