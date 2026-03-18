@@ -22,15 +22,18 @@ export const constructorSlice = createSlice({
     setBun: (state, action: PayloadAction<TIngredient>) => {
       state.bun = action.payload;
     },
-    addIngredient: (state, action: PayloadAction<TIngredient>) => {
-      if (!state.ingredients) {
-        state.ingredients = [];
-      }
-
-      state.ingredients.push({
-        ...action.payload,
-        id: nanoid(),
-      });
+    addIngredient: {
+      reducer: (state, action: PayloadAction<ConstructorIngredient>) => {
+        state.ingredients.push(action.payload);
+      },
+      prepare: (ingredient: TIngredient): { payload: ConstructorIngredient } => {
+        return {
+          payload: {
+            ...ingredient,
+            id: nanoid(),
+          },
+        };
+      },
     },
     removeIngredient: (state, action: PayloadAction<string>) => {
       state.ingredients = state.ingredients.filter((item) => item.id !== action.payload);

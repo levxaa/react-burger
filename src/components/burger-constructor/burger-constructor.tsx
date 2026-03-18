@@ -23,18 +23,13 @@ import { OrderDetailes } from '../order-detailes/order-detailes';
 import type { TIngredient } from '@utils/types';
 
 import styles from './burger-constructor.module.css';
-type TBurgerConstructorProps = {
-  ingredients: TIngredient[];
-};
+
 const IngredientType = {
   INGREDIENT: 'ingredient',
   BUN: 'bun',
 } as const;
 
-export const BurgerConstructor = ({
-  ingredients,
-}: TBurgerConstructorProps): React.JSX.Element => {
-  console.log(ingredients);
+export const BurgerConstructor = (): React.JSX.Element => {
   const { isModalOpen, openModal, closeModal } = useModal();
   const [orderNumber, setOrderNumber] = useState<number | undefined>(undefined);
   const dispatch = useAppDispatch();

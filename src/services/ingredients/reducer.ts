@@ -1,14 +1,16 @@
-import { BASE_URL } from '@/utils/constants';
+import { request } from '@/utils/api';
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 
 import type { TIngredient } from '@/utils/types';
-
 type IngredientsState = {
   ingredients: TIngredient[];
   loading: boolean;
   error: string | null;
 };
-
+type IngredientsResponse = {
+  success: boolean;
+  data: TIngredient[];
+};
 const initialState: IngredientsState = {
   ingredients: [],
   loading: false,
@@ -19,14 +21,8 @@ export const fetchIngredients = createAsyncThunk(
   'ingredients/fetchIngredients',
   async (_, { rejectWithValue }) => {
     try {
-      const response = await fetch(`${BASE_URL}/ingredients`);
-      const data = (await response.json()) as { success: boolean; data: TIngredient[] };
-
-      if (!data.success) {
-        throw new Error('Failed to fetch ingredients');
-      }
-
-      return data.data;
+      const response = await request<IngredientsResponse>(`/ingredients`);
+      return response.data;
     } catch (error) {
       return rejectWithValue((error as Error).message);
     }

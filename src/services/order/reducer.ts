@@ -1,4 +1,4 @@
-import { BASE_URL } from '@/utils/constants';
+import { request } from '@/utils/api';
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 
 type OrderState = {
@@ -7,6 +7,11 @@ type OrderState = {
   error: string | null;
 };
 
+type OrderResponse = {
+  success: boolean;
+  order: { number: number };
+  name: string;
+};
 const initialState: OrderState = {
   order: null,
   loading: false,
@@ -17,24 +22,15 @@ export const createOrder = createAsyncThunk(
   'order/createOrder',
   async (ingredients: string[], { rejectWithValue }) => {
     try {
-      const response = await fetch(`${BASE_URL}/orders`, {
+      const response = await request<OrderResponse>(`/orders`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({ ingredients }),
       });
-      const data = (await response.json()) as {
-        success: boolean;
-        order: { number: number };
-        name: string;
-      };
 
-      if (!data.success) {
-        throw new Error('Failed to create order');
-      }
-
-      return { number: data.order.number, name: data.name };
+      return { number: response.order.number, name: response.name };
     } catch (error) {
       return rejectWithValue((error as Error).message);
     }

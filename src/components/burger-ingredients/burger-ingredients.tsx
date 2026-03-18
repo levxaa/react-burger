@@ -1,8 +1,11 @@
 import { useModal } from '@/hooks/useModal';
-import { selectIngredientCounts, useAppSelector } from '@/services/store';
+import {
+  selectIngredientCounts,
+  useAppDispatch,
+  useAppSelector,
+} from '@/services/store';
 import { Tab } from '@krgaa/react-developer-burger-ui-components';
 import { useState, useCallback, useRef } from 'react';
-import { useDispatch } from 'react-redux';
 
 import {
   selectIngredient,
@@ -17,23 +20,18 @@ import type { TIngredient } from '@utils/types';
 
 import styles from './burger-ingredients.module.css';
 
-type TBurgerIngredientsProps = {
-  ingredients: TIngredient[];
-};
-
-export const BurgerIngredients = ({
-  ingredients,
-}: TBurgerIngredientsProps): React.JSX.Element => {
-  console.log(ingredients);
+export const BurgerIngredients = (): React.JSX.Element => {
   const [currentTab, setCurrentTab] = useState('bun');
   const ingredientCount = useAppSelector(selectIngredientCounts);
 
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const currentIngredient = useAppSelector(
     (state) => state.ingredient.selectedIngredient
   );
 
   const { isModalOpen, openModal, closeModal } = useModal();
+
+  const { ingredients } = useAppSelector((state) => state.ingredients);
 
   const bunRef = useRef<HTMLHeadingElement>(null);
   const mainRef = useRef<HTMLHeadingElement>(null);
