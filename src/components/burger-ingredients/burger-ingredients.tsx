@@ -1,6 +1,16 @@
 import { useModal } from '@/hooks/useModal';
+import {
+  selectIngredientCounts,
+  useAppDispatch,
+  useAppSelector,
+} from '@/services/store';
 import { Tab } from '@krgaa/react-developer-burger-ui-components';
 import { useState, useCallback, useRef } from 'react';
+
+import {
+  selectIngredient,
+  clearIngredient,
+} from '@services/selected-ingredient/actions';
 
 import { BurgerIngredient } from '../burger-ingridient/burger-ingredient';
 import { IngredientDetails } from '../ingredient-detailes/ingredient-detailes';
@@ -10,44 +20,79 @@ import type { TIngredient } from '@utils/types';
 
 import styles from './burger-ingredients.module.css';
 
-type TBurgerIngredientsProps = {
-  ingredients: TIngredient[];
-};
-
-export const BurgerIngredients = ({
-  ingredients,
-}: TBurgerIngredientsProps): React.JSX.Element => {
-  console.log(ingredients);
+export const BurgerIngredients = (): React.JSX.Element => {
   const [currentTab, setCurrentTab] = useState('bun');
-  const [ingridientCount, setCounts] = useState<Record<string, number>>({});
-  const [currentIngredient, setIngredient] = useState<TIngredient | undefined>(
-    undefined
+  const ingredientCount = useAppSelector(selectIngredientCounts);
+
+  const dispatch = useAppDispatch();
+  const currentIngredient = useAppSelector(
+    (state) => state.ingredient.selectedIngredient
   );
+
   const { isModalOpen, openModal, closeModal } = useModal();
+
+  const { ingredients } = useAppSelector((state) => state.ingredients);
 
   const bunRef = useRef<HTMLHeadingElement>(null);
   const mainRef = useRef<HTMLHeadingElement>(null);
   const sauceRef = useRef<HTMLHeadingElement>(null);
+  const sectionRef = useRef<HTMLElement>(null);
+
+  const sections = [
+    { ref: bunRef, id: 'bun' },
+    { ref: mainRef, id: 'main' },
+    { ref: sauceRef, id: 'sauce' },
+  ];
 
   const handleTabClick = useCallback((val: string) => {
     setCurrentTab(val);
     console.log(`Tab ${val} clicked`);
 
-    const ref = val === 'bun' ? bunRef : val === 'main' ? mainRef : sauceRef;
-    ref.current?.scrollIntoView({
-      behavior: 'smooth',
-      block: 'start',
+    sections.forEach(({ ref, id }) => {
+      if (id === val) {
+        ref.current?.scrollIntoView({
+          behavior: 'smooth',
+          block: 'start',
+        });
+      }
     });
   }, []);
 
+  const handleScroll = useCallback(() => {
+    let closestId = currentTab;
+    let minDistance = Infinity;
+
+    const containerTop = sectionRef.current?.getBoundingClientRect().top ?? 0;
+
+    sections.forEach(({ ref, id }) => {
+      if (ref.current) {
+        const rect = ref.current.getBoundingClientRect();
+        const distance = Math.abs(rect.top - containerTop);
+
+        if (distance < minDistance) {
+          minDistance = distance;
+          closestId = id;
+        }
+      }
+    });
+
+    if (closestId !== currentTab) {
+      setCurrentTab(closestId);
+    }
+  }, [currentTab]);
+
   const handleIngredientClick = useCallback((id: string) => {
-    setIngredient(ingredients.find((item) => item._id === id));
+    const ingredient = ingredients.find((item) => item._id === id);
+    if (ingredient) {
+      dispatch(selectIngredient(ingredient));
+    }
     openModal();
-    setCounts((prev) => ({
-      ...prev,
-      [id]: (prev[id] || 0) + 1,
-    }));
   }, []);
+
+  const handleCloseModal = useCallback(() => {
+    closeModal();
+    dispatch(clearIngredient());
+  }, [closeModal, dispatch]);
 
   const renderIngredientsSection = (ingredients: TIngredient[]): React.JSX.Element => (
     <ul className={`${styles.ingredients_tab_content} pl-4 pr-1`}>
@@ -55,7 +100,7 @@ export const BurgerIngredients = ({
         <BurgerIngredient
           key={item._id}
           ingredient={item}
-          count={ingridientCount[item._id] || 0}
+          count={ingredientCount[item._id] || 0}
           onClick={() => handleIngredientClick(item._id)}
         />
       ))}
@@ -99,7 +144,11 @@ export const BurgerIngredients = ({
             </Tab>
           </ul>
         </nav>
-        <section className={`${styles.burger_ingredients_section} custom-scroll`}>
+        <section
+          ref={sectionRef}
+          onScroll={handleScroll}
+          className={`${styles.burger_ingredients_section} custom-scroll`}
+        >
           <h2 ref={bunRef} className="text text_type_main-medium mt-10 mb-6">
             Булки
           </h2>
@@ -116,7 +165,7 @@ export const BurgerIngredients = ({
       </section>
 
       {isModalOpen && (
-        <Modal onClose={closeModal} header={'Детали ингредиента'}>
+        <Modal onClose={handleCloseModal} header={'Детали ингредиента'}>
           {<IngredientDetails ingredient={currentIngredient} />}
         </Modal>
       )}

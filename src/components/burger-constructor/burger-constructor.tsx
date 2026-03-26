@@ -1,72 +1,173 @@
-import { useModal } from '@/hooks/useModal';
+import {
+  setBun,
+  addIngredient,
+  removeIngredient,
+  moveIngredient,
+} from '@/services/burger-constructor/reducer';
+import { createOrder, clearOrder } from '@/services/order/reducer';
 import {
   Button,
   ConstructorElement,
   CurrencyIcon,
-  DragIcon,
 } from '@krgaa/react-developer-burger-ui-components';
+import { useCallback, useMemo, useState } from 'react';
+import { useDrop } from 'react-dnd';
 
+import { useModal } from '@hooks/useModal';
+import { useAppSelector, useAppDispatch } from '@services/store';
+
+import { DraggableIngredient } from '../draggable-ingredient/draggable-ingredient';
 import { Modal } from '../modal/modal';
 import { OrderDetailes } from '../order-detailes/order-detailes';
 
 import type { TIngredient } from '@utils/types';
 
 import styles from './burger-constructor.module.css';
-type TBurgerConstructorProps = {
-  ingredients: TIngredient[];
-};
 
-export const BurgerConstructor = ({
-  ingredients,
-}: TBurgerConstructorProps): React.JSX.Element => {
+const IngredientType = {
+  INGREDIENT: 'ingredient',
+  BUN: 'bun',
+} as const;
+
+export const BurgerConstructor = (): React.JSX.Element => {
   const { isModalOpen, openModal, closeModal } = useModal();
+  const [orderNumber, setOrderNumber] = useState<number | undefined>(undefined);
+  const dispatch = useAppDispatch();
+  const { bun, ingredients: constructorIngredients } = useAppSelector(
+    (state) => state.burgerConstructor
+  );
+  const { loading, error } = useAppSelector((state) => state.order);
 
-  console.log(ingredients);
-  const ingredientToDisplay = ingredients.filter((item) => item.type !== 'bun');
+  const totalPrice = useMemo(() => {
+    const bunPrice = bun ? bun.price * 2 : 0;
+    const ingredientsPrice = constructorIngredients.reduce(
+      (sum, item) => sum + item.price,
+      0
+    );
+    return bunPrice + ingredientsPrice;
+  }, [bun, constructorIngredients]);
+
+  const [{ isOver }, dropRef] = useDrop({
+    accept: [IngredientType.INGREDIENT, IngredientType.BUN],
+    drop: (item: TIngredient) => {
+      if (item.type === 'bun') {
+        dispatch(setBun(item));
+      } else {
+        dispatch(addIngredient(item));
+      }
+    },
+    collect: (monitor) => ({
+      isOver: monitor.isOver(),
+    }),
+  });
+  console.log(isOver);
+
+  const handleOrder = useCallback(() => {
+    if (!bun) {
+      alert('Выберите булку!');
+      return;
+    }
+
+    const ingredientIds = [
+      bun._id,
+      ...constructorIngredients.map((item) => item._id),
+      bun._id,
+    ];
+    dispatch(createOrder(ingredientIds))
+      .unwrap()
+      .then((result) => {
+        setOrderNumber(result.number);
+        openModal();
+      })
+      .catch((err) => {
+        console.error('Order failed:', err);
+        alert(err);
+      });
+  }, [bun, constructorIngredients, dispatch, openModal]);
+
+  const handleCloseModal = useCallback(() => {
+    closeModal();
+    setOrderNumber(undefined);
+    dispatch(clearOrder());
+  }, [closeModal, dispatch]);
+
+  const handleRemoveIngredient = useCallback(
+    (id: string) => {
+      dispatch(removeIngredient(id));
+    },
+    [dispatch]
+  );
+
+  const renderIngredientsPlaceholder = (
+    type: 'top' | 'bottom' | 'middle',
+    text: string
+  ): React.JSX.Element => (
+    <div className={`${styles.placeholder} ${type} ml-8 mr-8`}>
+      <span className="text text_type_main-default text_color_inactive">{text}</span>
+    </div>
+  );
 
   return (
     <>
-      <section className={`${styles.burger_constructor} pl-4`}>
+      <section
+        ref={dropRef as unknown as React.Ref<HTMLLIElement>}
+        className={`${styles.burger_constructor} pl-4`}
+      >
         <div className="pl-8 pb-4 pr-4">
-          <ConstructorElement
-            isLocked
-            price={200}
-            text="Краторная булка N-200i (верх)"
-            thumbnail="https://react-burger-ui-components.education-services.ru/assets/img-CFqVEZmj.png"
-            type="top"
-          />
+          {bun ? (
+            <ConstructorElement
+              isLocked
+              type="top"
+              text={`${bun.name} (верх)`}
+              price={bun.price}
+              thumbnail={bun.image}
+            />
+          ) : (
+            renderIngredientsPlaceholder('top', 'Перетащите сюда булку')
+          )}
         </div>
         <ul className={`${styles.list} custom-scroll pl-4`}>
-          {ingredientToDisplay.map((item) => (
-            <div className={`${styles.list_item}`} key={item._id}>
-              <DragIcon type="primary" />
-              <ConstructorElement
-                text={item.name}
-                price={item.price}
-                thumbnail={item.image}
-              />
-            </div>
-          ))}
+          {constructorIngredients.length > 0
+            ? constructorIngredients.map((item, index) => (
+                <DraggableIngredient
+                  key={item.id}
+                  item={item}
+                  index={index}
+                  onRemove={handleRemoveIngredient}
+                  moveIngredient={moveIngredient}
+                />
+              ))
+            : renderIngredientsPlaceholder('middle', 'Перетаскивайте ингредиенты сюда')}
         </ul>
         <div className="pl-8 pt-4 pr-4">
-          <ConstructorElement
-            isLocked
-            price={200}
-            text="Краторная булка N-200i (верх)"
-            thumbnail="https://react-burger-ui-components.education-services.ru/assets/img-CFqVEZmj.png"
-            type="bottom"
-          />
+          {bun ? (
+            <ConstructorElement
+              isLocked
+              type="bottom"
+              text={`${bun.name} (низ)`}
+              price={bun.price}
+              thumbnail={bun.image}
+            />
+          ) : (
+            renderIngredientsPlaceholder('bottom', 'Перетащите сюда булку')
+          )}
         </div>
         <div className={`${styles.submit_info} mt-10`}>
-          <span className="text text_type_digits-default mr-2">610</span>
+          <span className="text text_type_digits-default mr-2">{totalPrice}</span>
           <CurrencyIcon type="primary" className="mr-10" />
-          <Button htmlType="submit" size="medium" type="primary" onClick={openModal}>
+          <Button htmlType="submit" size="medium" type="primary" onClick={handleOrder}>
             Оформить заказ
           </Button>
         </div>
       </section>
       {isModalOpen && (
-        <Modal onClose={closeModal}>{<OrderDetailes id="034536" />}</Modal>
+        <Modal onClose={handleCloseModal}>
+          {error ? (
+            <span>Упс, что то пошло не так...</span>
+          ) : (
+            <OrderDetailes orderNumber={orderNumber} isLoading={loading} />
+          )}
+        </Modal>
       )}
     </>
   );
