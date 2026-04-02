@@ -33,7 +33,7 @@ export const IngredientDetails = ({
       <ul className={styles.detailed_info}>
         {renderInfo('Калории, ккал', ingredient.calories)}
         {renderInfo('Белки, г', ingredient.proteins)}
-        {renderInfo('Жири, г', ingredient.fat)}
+        {renderInfo('Жиры, г', ingredient.fat)}
         {renderInfo('Углеводы, г', ingredient.carbohydrates)}
       </ul>
     </div>

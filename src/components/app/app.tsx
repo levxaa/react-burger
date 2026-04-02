@@ -1,22 +1,46 @@
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { Home } from '@/pages/home/home';
+import { IngredientPage } from '@/pages/ingredient-page/ingredient-page';
+import { fetchIngredients } from '@/services/ingredients/reducer';
+import { useAppDispatch } from '@/services/store';
+import { useEffect } from 'react';
+import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
 
 import { AppHeader } from '@components/app-header/app-header';
-import { Home } from '@pages/home';
+import { IngredientModal } from '@components/ingredient-modal/ingredient-modal';
 
 import styles from './app.module.css';
 
+type TLocationState = {
+  backgroundLocation?: ReturnType<typeof useLocation>;
+};
+
 export const App = (): React.JSX.Element => {
+  const dispatch = useAppDispatch();
+
+  useEffect(() => {
+    void dispatch(fetchIngredients());
+  }, [dispatch]);
+
+  const location = useLocation() as unknown as Location & {
+    state: TLocationState | null;
+  };
+  const backgroundLocation = location.state?.backgroundLocation;
+
   return (
-    <BrowserRouter>
-      <div className={styles.app}>
-        <AppHeader />
+    <div className={styles.app}>
+      <AppHeader />
+      <Routes location={backgroundLocation ?? location}>
+        <Route path="/" element={<Home />} />
+        <Route path="/ingredients/:id" element={<IngredientPage />} />
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
+
+      {backgroundLocation && (
         <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/ingredients/:id" element={<Home />} />
-          <Route path="*" element={<Navigate to="/" replace />} />
+          <Route path="/ingredients/:id" element={<IngredientModal />} />
         </Routes>
-      </div>
-    </BrowserRouter>
+      )}
+    </div>
   );
 };
 

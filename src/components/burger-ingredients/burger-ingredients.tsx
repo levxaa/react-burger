@@ -7,14 +7,9 @@ import { Tab } from '@krgaa/react-developer-burger-ui-components';
 import { useState, useCallback, useRef, useEffect } from 'react';
 import { useLocation, useParams, useNavigate } from 'react-router-dom';
 
-import {
-  selectIngredient,
-  clearIngredient,
-} from '@services/selected-ingredient/actions';
+import { selectIngredient } from '@services/selected-ingredient/actions';
 
 import { BurgerIngredient } from '../burger-ingridient/burger-ingredient';
-import { IngredientDetails } from '../ingredient-detailes/ingredient-detailes';
-import { Modal } from '../modal/modal';
 
 import type { TIngredient } from '@utils/types';
 
@@ -28,9 +23,6 @@ export const BurgerIngredients = (): React.JSX.Element => {
   const navigate = useNavigate();
 
   const dispatch = useAppDispatch();
-  const currentIngredient = useAppSelector(
-    (state) => state.ingredient.selectedIngredient
-  );
 
   const { ingredients } = useAppSelector((state) => state.ingredients);
 
@@ -91,13 +83,6 @@ export const BurgerIngredients = (): React.JSX.Element => {
     }
   }, [params.id, ingredients, dispatch]);
 
-  const handleCloseModal = useCallback(() => {
-    dispatch(clearIngredient());
-    void navigate('/');
-  }, [dispatch, navigate]);
-
-  const isIngredientsRoute = location.pathname.includes('/ingredients/');
-
   const renderIngredientsSection = (
     sectionIngredients: TIngredient[]
   ): React.JSX.Element => (
@@ -112,7 +97,9 @@ export const BurgerIngredients = (): React.JSX.Element => {
             if (ingredient) {
               dispatch(selectIngredient(ingredient));
             }
-            void navigate(`/ingredients/${item._id}`);
+            void navigate(`/ingredients/${item._id}`, {
+              state: { backgroundLocation: location },
+            });
           }}
         />
       ))}
@@ -172,12 +159,6 @@ export const BurgerIngredients = (): React.JSX.Element => {
           {renderIngredientsSection(ingredients.filter((item) => item.type === 'sauce'))}
         </section>
       </section>
-
-      {isIngredientsRoute && currentIngredient && (
-        <Modal onClose={handleCloseModal} header={'Детали ингредиента'}>
-          <IngredientDetails ingredient={currentIngredient} />
-        </Modal>
-      )}
     </>
   );
 };
