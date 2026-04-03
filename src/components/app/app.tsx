@@ -1,7 +1,14 @@
+import { FeedPage } from '@/pages/feed/feed-page';
+import { ForgotPasswordPage } from '@/pages/forgot-password/forgot-password-page';
 import { Home } from '@/pages/home/home';
 import { IngredientPage } from '@/pages/ingredient-page/ingredient-page';
 import { LoginPage } from '@/pages/login/login-page';
 import { NotFoundPage } from '@/pages/not-found/not-found-page';
+import { ProfileForm } from '@/pages/profile/profile-form';
+import { ProfileOrderPage } from '@/pages/profile/profile-order-page';
+import { ProfilePage } from '@/pages/profile/profile-page';
+import { RegisterPage } from '@/pages/register';
+import { ResetPasswordPage } from '@/pages/reset-password';
 import { fetchIngredients } from '@/services/ingredients/reducer';
 import { useAppDispatch } from '@/services/store';
 import { useEffect } from 'react';
@@ -34,15 +41,15 @@ export const App = (): React.JSX.Element => {
       <Routes location={backgroundLocation ?? location}>
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<LoginPage />} />
-        {/* <Route path="/register" element={<RegisterPage />} />
+        <Route path="/register" element={<RegisterPage />} />
         <Route path="/forgot-password" element={<ForgotPasswordPage />} />
         <Route path="/reset-password" element={<ResetPasswordPage />} />
-        <Route path="/feed" element={<FeedPage />} /> */}
+        <Route path="/feed" element={<FeedPage />} />
         <Route path="/ingredients/:id" element={<IngredientPage />} />
-        {/* <Route path="/profile" element={<ProfilePage />}>
+        <Route path="/profile" element={<ProfilePage />}>
           <Route index element={<ProfileForm />} />
           <Route path="orders" element={<ProfileOrderPage />} />
-        </Route> */}
+        </Route>
         <Route path="*" element={<NotFoundPage />} />
       </Routes>
 

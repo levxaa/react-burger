@@ -1,10 +1,10 @@
-import { useState } from 'react';
-import { Link } from 'react-router-dom';
 import {
   Button,
   Input,
   PasswordInput,
 } from '@krgaa/react-developer-burger-ui-components';
+import { useState } from 'react';
+import { Link } from 'react-router-dom';
 
 import styles from './auth.module.css';
 

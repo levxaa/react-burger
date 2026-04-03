@@ -1,9 +1,5 @@
+import { Input, PasswordInput } from '@krgaa/react-developer-burger-ui-components';
 import { useState } from 'react';
-import {
-  Button,
-  Input,
-  PasswordInput,
-} from '@krgaa/react-developer-burger-ui-components';
 
 import styles from './profile.module.css';
 
@@ -21,6 +17,7 @@ export const ProfileForm = (): React.JSX.Element => {
         value={name}
         onChange={(e) => setName(e.target.value)}
         extraClass="mb-6"
+        icon="EditIcon"
       />
       <Input
         placeholder="Логин"
@@ -29,16 +26,15 @@ export const ProfileForm = (): React.JSX.Element => {
         value={login}
         onChange={(e) => setLogin(e.target.value)}
         extraClass="mb-6"
+        icon="EditIcon"
       />
       <PasswordInput
         name="password"
         value={password}
         onChange={(e) => setPassword(e.target.value)}
         extraClass="mb-6"
+        icon="EditIcon"
       />
-      <Button type="primary" size="medium" htmlType="button">
-        Сохранить
-      </Button>
     </form>
   );
 };
