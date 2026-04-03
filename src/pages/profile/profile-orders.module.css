@@ -1,0 +1,9 @@
+.container {
+  width: 100%;
+}
+
+.placeholder {
+  color: var(--text-secondary-color);
+  text-align: center;
+  padding: 60px 0;
+}
