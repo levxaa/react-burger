@@ -1,10 +1,24 @@
-import { Link, Outlet, useLocation } from 'react-router-dom';
+import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom';
+
+import { logout } from '@services/auth/reducer';
+import { useAppDispatch } from '@services/store';
 
 import styles from './profile.module.css';
 
 export const ProfilePage = (): React.JSX.Element => {
+  const dispatch = useAppDispatch();
+  const navigate = useNavigate();
   const location = useLocation();
   const isOrdersActive = location.pathname.includes('/orders');
+
+  const handleLogout = (e: React.MouseEvent<HTMLAnchorElement>): void => {
+    e.preventDefault();
+    const logoutUser = async (): Promise<void> => {
+      await dispatch(logout());
+      await navigate('/login', { replace: true });
+    };
+    void logoutUser();
+  };
 
   return (
     <div className={styles.container}>
@@ -25,7 +39,11 @@ export const ProfilePage = (): React.JSX.Element => {
         >
           История заказов
         </Link>
-        <Link to="/login" className={`${styles.menu_item} text text_type_main-medium`}>
+        <Link
+          to="/login"
+          onClick={handleLogout}
+          className={`${styles.menu_item} text text_type_main-medium`}
+        >
           Выход
         </Link>
         <p

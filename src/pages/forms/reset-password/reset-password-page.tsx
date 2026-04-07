@@ -3,14 +3,36 @@ import {
   Input,
   PasswordInput,
 } from '@krgaa/react-developer-burger-ui-components';
-import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 
+import { setNewPasswordRequest } from '../../../utils/api';
 import { AuthForm } from '../auth-forms';
 
 export const ResetPasswordPage = (): React.JSX.Element => {
   const [password, setPassword] = useState('');
   const [code, setCode] = useState('');
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const hasRequestedReset = localStorage.getItem('passwordResetSent');
+    if (!hasRequestedReset) {
+      void navigate('/forgot-password', { replace: true });
+    }
+  }, [navigate]);
+
+  const handleSubmit = (): void => {
+    const resetPassword = async (): Promise<void> => {
+      try {
+        await setNewPasswordRequest(password, code);
+        localStorage.removeItem('passwordResetSent');
+        await navigate('/login', { replace: true });
+      } catch (error) {
+        console.error(error);
+      }
+    };
+    void resetPassword();
+  };
 
   return (
     <AuthForm>
@@ -29,7 +51,13 @@ export const ResetPasswordPage = (): React.JSX.Element => {
         onChange={(e) => setCode(e.target.value)}
         extraClass="mb-6"
       />
-      <Button type="primary" size="medium" htmlType="button" extraClass="mb-20">
+      <Button
+        type="primary"
+        size="medium"
+        htmlType="button"
+        extraClass="mb-20"
+        onClick={handleSubmit}
+      >
         Сохранить
       </Button>
       <p className="text text_type_main-default text_color_inactive">

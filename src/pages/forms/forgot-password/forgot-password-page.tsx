@@ -1,11 +1,26 @@
 import { Button, Input } from '@krgaa/react-developer-burger-ui-components';
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
+import { resetPasswordRequest } from '../../../utils/api';
 import { AuthForm } from '../auth-forms';
 
 export const ForgotPasswordPage = (): React.JSX.Element => {
   const [email, setEmail] = useState('');
+  const navigate = useNavigate();
+
+  const handleSubmit = (): void => {
+    const resetPassword = async (): Promise<void> => {
+      try {
+        await resetPasswordRequest(email);
+        localStorage.setItem('passwordResetSent', 'true');
+        await navigate('/reset-password');
+      } catch (error) {
+        console.error(error);
+      }
+    };
+    void resetPassword();
+  };
 
   return (
     <AuthForm>
@@ -18,7 +33,13 @@ export const ForgotPasswordPage = (): React.JSX.Element => {
         onChange={(e) => setEmail(e.target.value)}
         extraClass="mb-6"
       />
-      <Button type="primary" size="medium" htmlType="button" extraClass="mb-20">
+      <Button
+        type="primary"
+        size="medium"
+        htmlType="button"
+        extraClass="mb-20"
+        onClick={handleSubmit}
+      >
         Восстановить
       </Button>
       <p className="text text_type_main-default text_color_inactive">

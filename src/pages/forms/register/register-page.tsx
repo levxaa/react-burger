@@ -6,12 +6,20 @@ import {
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 
+import { register } from '@services/auth/reducer';
+import { useAppDispatch } from '@services/store';
+
 import { AuthForm } from '../auth-forms';
 
 export const RegisterPage = (): React.JSX.Element => {
+  const dispatch = useAppDispatch();
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+
+  const handleSubmit = (): void => {
+    void dispatch(register({ email, password, name }));
+  };
 
   return (
     <AuthForm>
@@ -38,7 +46,13 @@ export const RegisterPage = (): React.JSX.Element => {
         onChange={(e) => setPassword(e.target.value)}
         extraClass="mb-6"
       />
-      <Button type="primary" size="medium" htmlType="button" extraClass="mb-20">
+      <Button
+        type="primary"
+        size="medium"
+        htmlType="button"
+        extraClass="mb-20"
+        onClick={handleSubmit}
+      >
         Зарегистрироваться
       </Button>
       <p className="text text_type_main-default text_color_inactive">
