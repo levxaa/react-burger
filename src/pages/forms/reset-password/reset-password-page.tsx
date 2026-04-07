@@ -21,7 +21,8 @@ export const ResetPasswordPage = (): React.JSX.Element => {
     }
   }, [navigate]);
 
-  const handleSubmit = (): void => {
+  const handleSubmit = (e: React.FormEvent): void => {
+    e.preventDefault();
     const resetPassword = async (): Promise<void> => {
       try {
         await setNewPasswordRequest(password, code);
@@ -35,7 +36,7 @@ export const ResetPasswordPage = (): React.JSX.Element => {
   };
 
   return (
-    <AuthForm>
+    <AuthForm onSubmit={handleSubmit}>
       <h2 className="text text_type_main-medium mb-6">Восстановление пароля</h2>
       <PasswordInput
         name="password"
@@ -51,13 +52,7 @@ export const ResetPasswordPage = (): React.JSX.Element => {
         onChange={(e) => setCode(e.target.value)}
         extraClass="mb-6"
       />
-      <Button
-        type="primary"
-        size="medium"
-        htmlType="button"
-        extraClass="mb-20"
-        onClick={handleSubmit}
-      >
+      <Button type="primary" size="medium" htmlType="submit" extraClass="mb-20">
         Сохранить
       </Button>
       <p className="text text_type_main-default text_color_inactive">

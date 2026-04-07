@@ -28,7 +28,8 @@ export const LoginPage = (): React.JSX.Element => {
 
   const from = location.state?.from?.pathname ?? '/profile';
 
-  const handleSubmit = (): void => {
+  const handleSubmit = (e: React.FormEvent): void => {
+    e.preventDefault();
     const loginUser = async (): Promise<void> => {
       await dispatch(login({ email, password }));
       await navigate(from, { replace: true });
@@ -37,7 +38,7 @@ export const LoginPage = (): React.JSX.Element => {
   };
 
   return (
-    <AuthForm>
+    <AuthForm onSubmit={handleSubmit}>
       <h2 className="text text_type_main-medium mb-6">Вход</h2>
       <Input
         placeholder="E-mail"
@@ -53,13 +54,7 @@ export const LoginPage = (): React.JSX.Element => {
         onChange={(e) => setPassword(e.target.value)}
         extraClass="mb-6"
       />
-      <Button
-        type="primary"
-        size="medium"
-        htmlType="button"
-        extraClass="mb-20"
-        onClick={handleSubmit}
-      >
+      <Button type="primary" size="medium" htmlType="submit" extraClass="mb-20">
         Войти
       </Button>
       <p className="text text_type_main-default text_color_inactive">

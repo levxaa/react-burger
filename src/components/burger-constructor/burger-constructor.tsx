@@ -3,6 +3,7 @@ import {
   addIngredient,
   removeIngredient,
   moveIngredient,
+  clearConstructor,
 } from '@/services/burger-constructor/reducer';
 import { createOrder, clearOrder } from '@/services/order/reducer';
 import {
@@ -12,6 +13,7 @@ import {
 } from '@krgaa/react-developer-burger-ui-components';
 import { useCallback, useMemo, useState } from 'react';
 import { useDrop } from 'react-dnd';
+import { useNavigate, useLocation } from 'react-router-dom';
 
 import { useModal } from '@hooks/useModal';
 import { useAppSelector, useAppDispatch } from '@services/store';
@@ -33,10 +35,13 @@ export const BurgerConstructor = (): React.JSX.Element => {
   const { isModalOpen, openModal, closeModal } = useModal();
   const [orderNumber, setOrderNumber] = useState<number | undefined>(undefined);
   const dispatch = useAppDispatch();
+  const navigate = useNavigate();
+  const location = useLocation();
   const { bun, ingredients: constructorIngredients } = useAppSelector(
     (state) => state.burgerConstructor
   );
   const { loading, error } = useAppSelector((state) => state.order);
+  const { isAuth } = useAppSelector((state) => state.auth);
 
   const totalPrice = useMemo(() => {
     const bunPrice = bun ? bun.price * 2 : 0;
@@ -63,6 +68,11 @@ export const BurgerConstructor = (): React.JSX.Element => {
   console.log(isOver);
 
   const handleOrder = useCallback(() => {
+    if (!isAuth) {
+      void navigate('/login', { state: { from: location } });
+      return;
+    }
+
     if (!bun) {
       alert('Выберите булку!');
       return;
@@ -83,12 +93,13 @@ export const BurgerConstructor = (): React.JSX.Element => {
         console.error('Order failed:', err);
         alert(err);
       });
-  }, [bun, constructorIngredients, dispatch, openModal]);
+  }, [isAuth, bun, constructorIngredients, dispatch, navigate, location, openModal]);
 
   const handleCloseModal = useCallback(() => {
     closeModal();
     setOrderNumber(undefined);
     dispatch(clearOrder());
+    dispatch(clearConstructor());
   }, [closeModal, dispatch]);
 
   const handleRemoveIngredient = useCallback(
@@ -155,7 +166,13 @@ export const BurgerConstructor = (): React.JSX.Element => {
         <div className={`${styles.submit_info} mt-10`}>
           <span className="text text_type_digits-default mr-2">{totalPrice}</span>
           <CurrencyIcon type="primary" className="mr-10" />
-          <Button htmlType="submit" size="medium" type="primary" onClick={handleOrder}>
+          <Button
+            htmlType="submit"
+            size="medium"
+            type="primary"
+            onClick={handleOrder}
+            disabled={!bun}
+          >
             Оформить заказ
           </Button>
         </div>

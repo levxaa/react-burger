@@ -18,7 +18,8 @@ export const RegisterPage = (): React.JSX.Element => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
-  const handleSubmit = (): void => {
+  const handleSubmit = (e: React.FormEvent): void => {
+    e.preventDefault();
     const registerUser = async (): Promise<void> => {
       await dispatch(register({ email, password, name }));
       await navigate('/profile', { replace: true });
@@ -27,7 +28,7 @@ export const RegisterPage = (): React.JSX.Element => {
   };
 
   return (
-    <AuthForm>
+    <AuthForm onSubmit={handleSubmit}>
       <h2 className="text text_type_main-medium mb-6">Регистрация</h2>
       <Input
         placeholder="Имя"
@@ -51,13 +52,7 @@ export const RegisterPage = (): React.JSX.Element => {
         onChange={(e) => setPassword(e.target.value)}
         extraClass="mb-6"
       />
-      <Button
-        type="primary"
-        size="medium"
-        htmlType="button"
-        extraClass="mb-20"
-        onClick={handleSubmit}
-      >
+      <Button type="primary" size="medium" htmlType="submit" extraClass="mb-20">
         Зарегистрироваться
       </Button>
       <p className="text text_type_main-default text_color_inactive">

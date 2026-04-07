@@ -1,4 +1,4 @@
-import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom';
+import { NavLink, Outlet, useNavigate } from 'react-router-dom';
 
 import { logout } from '@services/auth/reducer';
 import { useAppDispatch } from '@services/store';
@@ -8,8 +8,6 @@ import styles from './profile.module.css';
 export const ProfilePage = (): React.JSX.Element => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
-  const location = useLocation();
-  const isOrdersActive = location.pathname.includes('/orders');
 
   const handleLogout = (e: React.MouseEvent<HTMLAnchorElement>): void => {
     e.preventDefault();
@@ -23,29 +21,30 @@ export const ProfilePage = (): React.JSX.Element => {
   return (
     <div className={styles.container}>
       <nav className={styles.menu}>
-        <Link
+        <NavLink
           to="/profile"
-          className={`${styles.link} text text_type_main-medium ${
-            !isOrdersActive ? styles.link_active : ''
-          }`}
+          end
+          className={({ isActive }) =>
+            `${styles.link} text text_type_main-medium ${isActive ? styles.link_active : ''}`
+          }
         >
           Профиль
-        </Link>
-        <Link
+        </NavLink>
+        <NavLink
           to="/profile/orders"
-          className={`${styles.link} text text_type_main-medium ${
-            isOrdersActive ? styles.link_active : ''
-          }`}
+          className={({ isActive }) =>
+            `${styles.link} text text_type_main-medium ${isActive ? styles.link_active : ''}`
+          }
         >
           История заказов
-        </Link>
-        <Link
+        </NavLink>
+        <NavLink
           to="/login"
           onClick={handleLogout}
           className={`${styles.link} text text_type_main-medium`}
         >
           Выход
-        </Link>
+        </NavLink>
         <p
           className={`${styles.menu_hint} text text_type_main-default text_color_inactive mt-20`}
         >

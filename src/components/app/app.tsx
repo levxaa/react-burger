@@ -49,7 +49,7 @@ export const App = (): React.JSX.Element => {
         <Route
           path="/login"
           element={
-            <ProtectedRoute onlyAuth={false}>
+            <ProtectedRoute anonymous>
               <LoginPage />
             </ProtectedRoute>
           }
@@ -57,7 +57,7 @@ export const App = (): React.JSX.Element => {
         <Route
           path="/register"
           element={
-            <ProtectedRoute onlyAuth={false}>
+            <ProtectedRoute anonymous>
               <RegisterPage />
             </ProtectedRoute>
           }
@@ -65,7 +65,7 @@ export const App = (): React.JSX.Element => {
         <Route
           path="/forgot-password"
           element={
-            <ProtectedRoute onlyAuth={false}>
+            <ProtectedRoute anonymous>
               <ForgotPasswordPage />
             </ProtectedRoute>
           }
@@ -73,7 +73,7 @@ export const App = (): React.JSX.Element => {
         <Route
           path="/reset-password"
           element={
-            <ProtectedRoute onlyAuth={false}>
+            <ProtectedRoute anonymous>
               <ResetPasswordPage />
             </ProtectedRoute>
           }

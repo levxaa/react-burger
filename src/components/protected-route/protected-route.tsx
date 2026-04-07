@@ -3,26 +3,35 @@ import { Navigate, useLocation } from 'react-router-dom';
 import { useAppSelector } from '@services/store';
 
 type ProtectedRouteProps = {
-  onlyAuth?: boolean;
   children: React.ReactNode;
+  anonymous?: boolean;
+};
+
+type TLocationState = {
+  from?: {
+    pathname: string;
+  };
 };
 
 export const ProtectedRoute = ({
-  onlyAuth = true,
   children,
+  anonymous = false,
 }: ProtectedRouteProps): React.JSX.Element => {
   const { isAuth } = useAppSelector((state) => state.auth);
-  const location = useLocation();
+  const location = useLocation() as unknown as Location & {
+    state: TLocationState | null;
+  };
+  const from = location.state?.from?.pathname ?? '/';
 
-  if (onlyAuth) {
-    if (isAuth) {
-      return <>{children}</>;
-    }
+  if (anonymous && isAuth) {
+    return <Navigate to={from} replace />;
+  }
+
+  if (!anonymous && !isAuth) {
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
 
-  if (!isAuth) {
-    return <>{children}</>;
-  }
-  return <Navigate to="/profile" replace />;
+  return <>{children}</>;
 };
+
+export default ProtectedRoute;
