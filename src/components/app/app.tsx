@@ -9,6 +9,7 @@ import { NotFoundPage } from '@/pages/not-found/not-found-page';
 import { ProfileOrderPage } from '@/pages/profile/orders/profile-order-page';
 import { ProfileForm } from '@/pages/profile/profile-form';
 import { ProfilePage } from '@/pages/profile/profile-page';
+import { checkAuth } from '@/services/auth/reducer';
 import { fetchIngredients } from '@/services/ingredients/reducer';
 import { useAppDispatch } from '@/services/store';
 import { useEffect } from 'react';
@@ -16,11 +17,15 @@ import { Routes, Route, useLocation } from 'react-router-dom';
 
 import { AppHeader } from '@components/app-header/app-header';
 import { IngredientModal } from '@components/ingredient-modal/ingredient-modal';
+import { ProtectedRoute } from '@components/protected-route/protected-route';
 
 import styles from './app.module.css';
 
 type TLocationState = {
   backgroundLocation?: ReturnType<typeof useLocation>;
+  from?: {
+    pathname: string;
+  };
 };
 
 export const App = (): React.JSX.Element => {
@@ -28,6 +33,7 @@ export const App = (): React.JSX.Element => {
 
   useEffect(() => {
     void dispatch(fetchIngredients());
+    void dispatch(checkAuth());
   }, [dispatch]);
 
   const location = useLocation() as unknown as Location & {
@@ -40,13 +46,48 @@ export const App = (): React.JSX.Element => {
       <AppHeader />
       <Routes location={backgroundLocation ?? location}>
         <Route path="/" element={<Home />} />
-        <Route path="/login" element={<LoginPage />} />
-        <Route path="/register" element={<RegisterPage />} />
-        <Route path="/forgot-password" element={<ForgotPasswordPage />} />
-        <Route path="/reset-password" element={<ResetPasswordPage />} />
+        <Route
+          path="/login"
+          element={
+            <ProtectedRoute onlyAuth={false}>
+              <LoginPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/register"
+          element={
+            <ProtectedRoute onlyAuth={false}>
+              <RegisterPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/forgot-password"
+          element={
+            <ProtectedRoute onlyAuth={false}>
+              <ForgotPasswordPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/reset-password"
+          element={
+            <ProtectedRoute onlyAuth={false}>
+              <ResetPasswordPage />
+            </ProtectedRoute>
+          }
+        />
         <Route path="/feed" element={<FeedPage />} />
         <Route path="/ingredients/:id" element={<IngredientPage />} />
-        <Route path="/profile" element={<ProfilePage />}>
+        <Route
+          path="/profile"
+          element={
+            <ProtectedRoute>
+              <ProfilePage />
+            </ProtectedRoute>
+          }
+        >
           <Route index element={<ProfileForm />} />
           <Route path="orders" element={<ProfileOrderPage />} />
         </Route>

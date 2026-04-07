@@ -25,16 +25,16 @@ export const ProfilePage = (): React.JSX.Element => {
       <nav className={styles.menu}>
         <Link
           to="/profile"
-          className={`${styles.menu_item} text text_type_main-medium ${
-            !isOrdersActive ? styles.menu_item_active : ''
+          className={`${styles.link} text text_type_main-medium ${
+            !isOrdersActive ? styles.link_active : ''
           }`}
         >
           Профиль
         </Link>
         <Link
           to="/profile/orders"
-          className={`${styles.menu_item} text text_type_main-medium ${
-            isOrdersActive ? styles.menu_item_active : ''
+          className={`${styles.link} text text_type_main-medium ${
+            isOrdersActive ? styles.link_active : ''
           }`}
         >
           История заказов
@@ -42,7 +42,7 @@ export const ProfilePage = (): React.JSX.Element => {
         <Link
           to="/login"
           onClick={handleLogout}
-          className={`${styles.menu_item} text text_type_main-medium`}
+          className={`${styles.link} text text_type_main-medium`}
         >
           Выход
         </Link>

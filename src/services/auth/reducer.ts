@@ -1,11 +1,14 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 
 import {
+  getUserRequest,
   loginRequest,
   logoutRequest,
   registerRequest,
   setTokens,
   clearTokens,
+  getRefreshToken,
+  updateUserRequest,
 } from '../../utils/api';
 
 export type TUser = {
@@ -61,6 +64,31 @@ export const logout = createAsyncThunk('auth/logout', async () => {
   clearTokens();
 });
 
+export const checkAuth = createAsyncThunk('auth/checkAuth', async () => {
+  const refreshToken = getRefreshToken();
+  if (!refreshToken) {
+    return Promise.reject(new Error('No refresh token'));
+  }
+  const data = await getUserRequest();
+  return data.user;
+});
+
+export const updateUser = createAsyncThunk(
+  'auth/updateUser',
+  async ({
+    name,
+    email,
+    password,
+  }: {
+    name: string;
+    email: string;
+    password: string;
+  }) => {
+    const data = await updateUserRequest(name, email, password);
+    return data.user;
+  }
+);
+
 export const authSlice = createSlice({
   name: 'auth',
   initialState,
@@ -101,6 +129,23 @@ export const authSlice = createSlice({
         state.user = null;
         state.isAuth = false;
         state.error = null;
+      })
+      .addCase(checkAuth.pending, (state) => {
+        state.isLoading = true;
+      })
+      .addCase(checkAuth.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.isAuth = true;
+        state.user = action.payload;
+      })
+      .addCase(checkAuth.rejected, (state) => {
+        state.isLoading = false;
+        state.isAuth = false;
+        state.user = null;
+        clearTokens();
+      })
+      .addCase(updateUser.fulfilled, (state, action) => {
+        state.user = action.payload;
       });
   },
 });

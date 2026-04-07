@@ -15,6 +15,10 @@ export type TUser = {
   name: string;
 };
 
+export type TUserResponse = {
+  success: boolean;
+  user: TUser;
+};
 const checkResponse = <T>(res: Response): Promise<T> => {
   if (res.ok) {
     return res.json();
@@ -45,14 +49,14 @@ export const registerRequest = (
   password: string,
   name: string
 ): Promise<TAuthResponse> =>
-  request<TAuthResponse>(`${BASE_URL}/auth/register`, {
+  request<TAuthResponse>('/auth/register', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ email, password, name }),
   });
 
 export const loginRequest = (email: string, password: string): Promise<TAuthResponse> =>
-  request<TAuthResponse>(`${BASE_URL}/auth/login`, {
+  request<TAuthResponse>('/auth/login', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ email, password }),
@@ -61,14 +65,14 @@ export const loginRequest = (email: string, password: string): Promise<TAuthResp
 export const logoutRequest = (
   refreshToken: string
 ): Promise<{ success: boolean; message: string }> =>
-  request<{ success: boolean; message: string }>(`${BASE_URL}/auth/logout`, {
+  request<{ success: boolean; message: string }>('/auth/logout', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ token: refreshToken }),
   });
 
 export const refreshTokenRequest = (refreshToken: string): Promise<TAuthResponse> =>
-  request<TAuthResponse>(`${BASE_URL}/auth/token`, {
+  request<TAuthResponse>('/auth/token', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ token: refreshToken }),
@@ -103,7 +107,10 @@ export const fetchWithRefresh = async <T>(
 
   const accessToken = getAccessToken();
   if (accessToken) {
-    (defaultHeaders as Record<string, string>).Authorization = accessToken;
+    const token = accessToken.startsWith('Bearer ')
+      ? accessToken
+      : `Bearer ${accessToken}`;
+    (defaultHeaders as Record<string, string>).Authorization = token;
   }
 
   try {
@@ -115,7 +122,10 @@ export const fetchWithRefresh = async <T>(
         const newTokens = await refreshTokenRequest(refreshToken);
         setTokens(newTokens.accessToken, newTokens.refreshToken);
 
-        (defaultHeaders as Record<string, string>).Authorization = newTokens.accessToken;
+        const newToken = newTokens.accessToken.startsWith('Bearer ')
+          ? newTokens.accessToken
+          : `Bearer ${newTokens.accessToken}`;
+        (defaultHeaders as Record<string, string>).Authorization = newToken;
         return await request<T>(endpoint, { ...options, headers: defaultHeaders });
       }
     }
@@ -126,7 +136,7 @@ export const fetchWithRefresh = async <T>(
 export const resetPasswordRequest = (
   email: string
 ): Promise<{ success: boolean; message: string }> =>
-  request<{ success: boolean; message: string }>(`${BASE_URL}/password-reset`, {
+  request<{ success: boolean; message: string }>('/password-reset', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ email }),
@@ -136,8 +146,23 @@ export const setNewPasswordRequest = (
   password: string,
   token: string
 ): Promise<{ success: boolean; message: string }> =>
-  request<{ success: boolean; message: string }>(`${BASE_URL}/password-reset/reset`, {
+  request<{ success: boolean; message: string }>('/password-reset/reset', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ password, token }),
+  });
+
+export const getUserRequest = (): Promise<TUserResponse> =>
+  fetchWithRefresh<TUserResponse>('/auth/user', {
+    method: 'GET',
+  });
+
+export const updateUserRequest = (
+  name: string,
+  email: string,
+  password: string
+): Promise<TUserResponse> =>
+  fetchWithRefresh<TUserResponse>('/auth/user', {
+    method: 'PATCH',
+    body: JSON.stringify({ name, email, password }),
   });

@@ -4,7 +4,7 @@ import {
   PasswordInput,
 } from '@krgaa/react-developer-burger-ui-components';
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 import { register } from '@services/auth/reducer';
 import { useAppDispatch } from '@services/store';
@@ -13,12 +13,17 @@ import { AuthForm } from '../auth-forms';
 
 export const RegisterPage = (): React.JSX.Element => {
   const dispatch = useAppDispatch();
+  const navigate = useNavigate();
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
   const handleSubmit = (): void => {
-    void dispatch(register({ email, password, name }));
+    const registerUser = async (): Promise<void> => {
+      await dispatch(register({ email, password, name }));
+      await navigate('/profile', { replace: true });
+    };
+    void registerUser();
   };
 
   return (

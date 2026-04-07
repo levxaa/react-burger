@@ -4,20 +4,36 @@ import {
   PasswordInput,
 } from '@krgaa/react-developer-burger-ui-components';
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 
 import { login } from '@services/auth/reducer';
 import { useAppDispatch } from '@services/store';
 
 import { AuthForm } from '../auth-forms';
 
+type TLocationState = {
+  from?: {
+    pathname: string;
+  };
+};
+
 export const LoginPage = (): React.JSX.Element => {
   const dispatch = useAppDispatch();
+  const navigate = useNavigate();
+  const location = useLocation() as unknown as Location & {
+    state: TLocationState | null;
+  };
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
+  const from = location.state?.from?.pathname ?? '/profile';
+
   const handleSubmit = (): void => {
-    void dispatch(login({ email, password }));
+    const loginUser = async (): Promise<void> => {
+      await dispatch(login({ email, password }));
+      await navigate(from, { replace: true });
+    };
+    void loginUser();
   };
 
   return (
