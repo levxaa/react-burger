@@ -1,9 +1,15 @@
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
 .container {
   display: flex;
+  gap: 80px;
   max-width: 1000px;
   margin: 0 auto;
   padding: 120px 40px 40px;
-  gap: 80px;
 }
 
 .menu {
@@ -34,10 +40,4 @@
 .content {
   flex: 1;
   max-width: 480px;
-}
-
-.form {
-  display: flex;
-  flex-direction: column;
-  gap: 24px;
 }

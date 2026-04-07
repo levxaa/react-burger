@@ -2,9 +2,9 @@ import type { ReactNode } from 'react';
 
 import styles from './auth-forms.module.css';
 
-interface AuthFormProps {
+type AuthFormProps = {
   children: ReactNode;
-}
+};
 
 export const AuthForm = ({ children }: AuthFormProps): React.JSX.Element => {
   return (

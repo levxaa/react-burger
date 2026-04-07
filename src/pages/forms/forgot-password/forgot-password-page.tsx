@@ -22,10 +22,7 @@ export const ForgotPasswordPage = (): React.JSX.Element => {
         Восстановить
       </Button>
       <p className="text text_type_main-default text_color_inactive">
-        Вспомнили пароль?{' '}
-        <Link to="/login">
-          Войти
-        </Link>
+        Вспомнили пароль? <Link to="/login">Войти</Link>
       </p>
     </AuthForm>
   );
