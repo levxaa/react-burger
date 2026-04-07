@@ -6,15 +6,14 @@ import {
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 
-import styles from './auth.module.css';
+import { AuthForm } from '../auth-forms';
 
 export const ResetPasswordPage = (): React.JSX.Element => {
   const [password, setPassword] = useState('');
   const [code, setCode] = useState('');
 
   return (
-    <div className={styles.container}>
-      <form className={styles.form}>
+      <AuthForm>
         <h2 className="text text_type_main-medium mb-6">Восстановление пароля</h2>
         <PasswordInput
           name="password"
@@ -35,11 +34,10 @@ export const ResetPasswordPage = (): React.JSX.Element => {
         </Button>
         <p className="text text_type_main-default text_color_inactive">
           Уже были на этой странице?{' '}
-          <Link to="/login" className={styles.link}>
+          <Link to="/login">
             Войти
           </Link>
         </p>
-      </form>
-    </div>
+      </AuthForm>
   );
 };

@@ -6,12 +6,3 @@
   min-height: 60vh;
   color: var(--text-secondary-color);
 }
-
-.link {
-  color: var(--accent);
-  text-decoration: none;
-}
-
-.link:hover {
-  text-decoration: underline;
-}

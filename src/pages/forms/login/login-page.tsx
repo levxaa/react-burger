@@ -5,16 +5,14 @@ import {
 } from '@krgaa/react-developer-burger-ui-components';
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-
-import styles from './auth.module.css';
+import { AuthForm } from '../auth-forms';
 
 export const LoginPage = (): React.JSX.Element => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
   return (
-    <div className={styles.container}>
-      <form className={styles.form}>
+      <AuthForm>
         <h2 className="text text_type_main-medium mb-6">Вход</h2>
         <Input
           placeholder="E-mail"
@@ -35,17 +33,16 @@ export const LoginPage = (): React.JSX.Element => {
         </Button>
         <p className="text text_type_main-default text_color_inactive">
           Вы — новый пользователь?{' '}
-          <Link to="/register" className={styles.link}>
+          <Link to="/register">
             Зарегистрироваться
           </Link>
         </p>
         <p className="text text_type_main-default text_color_inactive mt-4">
           Забыли пароль?{' '}
-          <Link to="/forgot-password" className={styles.link}>
+          <Link to="/forgot-password">
             Восстановить пароль
           </Link>
         </p>
-      </form>
-    </div>
+      </AuthForm>
   );
 };

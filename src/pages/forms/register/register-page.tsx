@@ -6,7 +6,7 @@ import {
   PasswordInput,
 } from '@krgaa/react-developer-burger-ui-components';
 
-import styles from './auth.module.css';
+import { AuthForm } from '../auth-forms';
 
 export const RegisterPage = (): React.JSX.Element => {
   const [name, setName] = useState('');
@@ -14,8 +14,7 @@ export const RegisterPage = (): React.JSX.Element => {
   const [password, setPassword] = useState('');
 
   return (
-    <div className={styles.container}>
-      <form className={styles.form}>
+      <AuthForm>
         <h2 className="text text_type_main-medium mb-6">Регистрация</h2>
         <Input
           placeholder="Имя"
@@ -44,11 +43,10 @@ export const RegisterPage = (): React.JSX.Element => {
         </Button>
         <p className="text text_type_main-default text_color_inactive">
           Уже зарегистрированы?{' '}
-          <Link to="/login" className={styles.link}>
+          <Link to="/login">
             Войти
           </Link>
         </p>
-      </form>
-    </div>
+      </AuthForm>
   );
 };
