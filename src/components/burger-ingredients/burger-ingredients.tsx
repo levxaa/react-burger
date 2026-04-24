@@ -1,20 +1,15 @@
-import { useModal } from '@/hooks/useModal';
 import {
   selectIngredientCounts,
   useAppDispatch,
   useAppSelector,
 } from '@/services/store';
 import { Tab } from '@krgaa/react-developer-burger-ui-components';
-import { useState, useCallback, useRef } from 'react';
+import { useState, useCallback, useRef, useEffect } from 'react';
+import { useLocation, useParams, useNavigate } from 'react-router-dom';
 
-import {
-  selectIngredient,
-  clearIngredient,
-} from '@services/selected-ingredient/actions';
+import { selectIngredient } from '@services/selected-ingredient/actions';
 
 import { BurgerIngredient } from '../burger-ingridient/burger-ingredient';
-import { IngredientDetails } from '../ingredient-detailes/ingredient-detailes';
-import { Modal } from '../modal/modal';
 
 import type { TIngredient } from '@utils/types';
 
@@ -23,13 +18,11 @@ import styles from './burger-ingredients.module.css';
 export const BurgerIngredients = (): React.JSX.Element => {
   const [currentTab, setCurrentTab] = useState('bun');
   const ingredientCount = useAppSelector(selectIngredientCounts);
+  const location = useLocation();
+  const params = useParams<{ id: string }>();
+  const navigate = useNavigate();
 
   const dispatch = useAppDispatch();
-  const currentIngredient = useAppSelector(
-    (state) => state.ingredient.selectedIngredient
-  );
-
-  const { isModalOpen, openModal, closeModal } = useModal();
 
   const { ingredients } = useAppSelector((state) => state.ingredients);
 
@@ -46,7 +39,6 @@ export const BurgerIngredients = (): React.JSX.Element => {
 
   const handleTabClick = useCallback((val: string) => {
     setCurrentTab(val);
-    console.log(`Tab ${val} clicked`);
 
     sections.forEach(({ ref, id }) => {
       if (id === val) {
@@ -81,27 +73,34 @@ export const BurgerIngredients = (): React.JSX.Element => {
     }
   }, [currentTab]);
 
-  const handleIngredientClick = useCallback((id: string) => {
-    const ingredient = ingredients.find((item) => item._id === id);
-    if (ingredient) {
-      dispatch(selectIngredient(ingredient));
+  useEffect(() => {
+    const ingredientId = params.id;
+    if (ingredientId && ingredients.length > 0) {
+      const ingredient = ingredients.find((item) => item._id === ingredientId);
+      if (ingredient) {
+        dispatch(selectIngredient(ingredient));
+      }
     }
-    openModal();
-  }, []);
+  }, [params.id, ingredients, dispatch]);
 
-  const handleCloseModal = useCallback(() => {
-    closeModal();
-    dispatch(clearIngredient());
-  }, [closeModal, dispatch]);
-
-  const renderIngredientsSection = (ingredients: TIngredient[]): React.JSX.Element => (
+  const renderIngredientsSection = (
+    sectionIngredients: TIngredient[]
+  ): React.JSX.Element => (
     <ul className={`${styles.ingredients_tab_content} pl-4 pr-1`}>
-      {ingredients.map((item) => (
+      {sectionIngredients.map((item) => (
         <BurgerIngredient
           key={item._id}
           ingredient={item}
           count={ingredientCount[item._id] || 0}
-          onClick={() => handleIngredientClick(item._id)}
+          onClick={() => {
+            const ingredient = ingredients.find((i) => i._id === item._id);
+            if (ingredient) {
+              dispatch(selectIngredient(ingredient));
+            }
+            void navigate(`/ingredients/${item._id}`, {
+              state: { backgroundLocation: location },
+            });
+          }}
         />
       ))}
     </ul>
@@ -116,7 +115,6 @@ export const BurgerIngredients = (): React.JSX.Element => {
               value="bun"
               active={currentTab === 'bun'}
               onClick={() => {
-                /* TODO */
                 handleTabClick('bun');
               }}
             >
@@ -126,7 +124,6 @@ export const BurgerIngredients = (): React.JSX.Element => {
               value="main"
               active={currentTab === 'main'}
               onClick={() => {
-                /* TODO */
                 handleTabClick('main');
               }}
             >
@@ -136,7 +133,6 @@ export const BurgerIngredients = (): React.JSX.Element => {
               value="sauce"
               active={currentTab === 'sauce'}
               onClick={() => {
-                /* TODO */
                 handleTabClick('sauce');
               }}
             >
@@ -163,12 +159,6 @@ export const BurgerIngredients = (): React.JSX.Element => {
           {renderIngredientsSection(ingredients.filter((item) => item.type === 'sauce'))}
         </section>
       </section>
-
-      {isModalOpen && (
-        <Modal onClose={handleCloseModal} header={'Детали ингредиента'}>
-          {<IngredientDetails ingredient={currentIngredient} />}
-        </Modal>
-      )}
     </>
   );
 };
