@@ -2,8 +2,10 @@
   width: 100%;
 }
 
-.placeholder {
-  padding: 60px 0;
-  color: var(--text-secondary-color);
-  text-align: center;
+.ordersList {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  max-height: 800px;
+  overflow-y: auto;
 }
