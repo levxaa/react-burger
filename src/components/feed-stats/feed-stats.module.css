@@ -19,7 +19,7 @@
 .row {
   display: flex;
   flex-direction: row;
-  gap: 8px;
+  gap: 10px;
   color: rgb(74 165 127);
 }
 
