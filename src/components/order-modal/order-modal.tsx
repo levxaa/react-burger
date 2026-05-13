@@ -58,7 +58,7 @@ export const OrderModal = (): React.JSX.Element => {
   }, [id, feedOrders, userOrders]);
 
   const handleCloseModal = (): void => {
-    void navigate('/');
+    void navigate(-1);
   };
 
   if (isLoading) {
