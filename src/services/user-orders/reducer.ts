@@ -1,7 +1,6 @@
 import { createSlice } from '@reduxjs/toolkit';
 
 import type { TOrdersResponse } from '../../utils/types';
-// store/userOrders/userOrdersSlice.ts
 import type { PayloadAction } from '@reduxjs/toolkit';
 
 type UserOrdersState = {

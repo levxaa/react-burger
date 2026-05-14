@@ -1,7 +1,5 @@
 import { BASE_URL } from './constants';
 
-import type { TSingleOrderResponse } from './types';
-
 export type TAuthResponse = {
   success: boolean;
   accessToken: string;
@@ -167,11 +165,4 @@ export const updateUserRequest = (
   fetchWithRefresh<TUserResponse>('/auth/user', {
     method: 'PATCH',
     body: JSON.stringify({ name, email, password }),
-  });
-
-export const getOrderByNumberRequest = (
-  orderNumber: number
-): Promise<TSingleOrderResponse> =>
-  fetchWithRefresh<TSingleOrderResponse>(`/orders/${orderNumber}`, {
-    method: 'GET',
   });

@@ -31,8 +31,3 @@ export type TOrdersResponse = {
   total: number;
   totalToday: number;
 };
-
-export type TSingleOrderResponse = {
-  success: boolean;
-  orders: TOrder[];
-};

@@ -1,74 +1,58 @@
+import { useAppDispatch, useAppSelector } from '@/services/store';
+import { getAccessToken } from '@/utils/api';
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 
 import { OrderInfo } from '@components/order-info/order-info';
-import { useAppSelector } from '@services/store';
-import { getOrderByNumberRequest } from '@utils/api';
-
-import type { TOrder } from '@utils/types';
+import { connect, disconnect } from '@services/user-orders/reducer';
 
 import styles from './profile-order-info.module.css';
 
 export const ProfileOrderInfoPage = (): React.JSX.Element => {
   const { id } = useParams<{ id: string }>();
-  const [order, setOrder] = useState<TOrder | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const dispatch = useAppDispatch();
+
+  const userOrders = useAppSelector((state) => state.userOrders.orders);
+  const isConnected = useAppSelector((state) => state.userOrders.isConnected);
+
+  const [order, setOrder] = useState<(typeof userOrders)[0] | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  const feedOrders = useAppSelector((state) => state.feed.orders);
-  const userOrders = useAppSelector((state) => state.userOrders.orders);
+  useEffect(() => {
+    if (!isConnected) {
+      const token = getAccessToken();
+      if (token) {
+        dispatch(connect(token));
+      }
+    }
+  }, [dispatch, isConnected]);
+
+  useEffect(() => {
+    return (): void => {
+      dispatch(disconnect());
+    };
+  }, [dispatch]);
 
   useEffect(() => {
     if (!id) return;
 
     const orderNumber = parseInt(id, 10);
-
-    const foundInFeed = feedOrders.find((o) => o.number === orderNumber);
     const foundInUserOrders = userOrders.find((o) => o.number === orderNumber);
-
-    if (foundInFeed) {
-      setOrder(foundInFeed);
-      setIsLoading(false);
-      return;
-    }
 
     if (foundInUserOrders) {
       setOrder(foundInUserOrders);
-      setIsLoading(false);
+      setError(null);
       return;
     }
 
-    const fetchOrder = async (): Promise<void> => {
-      try {
-        const response = await getOrderByNumberRequest(orderNumber);
-        if (response.orders && response.orders.length > 0) {
-          setOrder(response.orders[0]);
-        } else {
-          setError('Заказ не найден');
-        }
-      } catch (e) {
-        setError('Ошибка при получении заказа');
-        console.error(e);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    void fetchOrder();
-  }, [id, feedOrders, userOrders]);
-
-  if (isLoading) {
-    return (
-      <div className={styles.page}>
-        <p className="text text_type_main-default">Загрузка...</p>
-      </div>
-    );
-  }
+    setError('Заказ не найден');
+    setOrder(null);
+  }, [id, userOrders]);
 
   if (error || !order) {
     return (
       <div className={styles.page}>
-        <p className="text text_type_main-default">{error && 'Заказ не найден'}</p>
+        <p className="text text_type_main-default">{error ?? 'Заказ не найден'}</p>
       </div>
     );
   }

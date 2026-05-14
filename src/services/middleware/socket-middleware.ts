@@ -26,7 +26,6 @@ export const socketMiddleware = (config: SocketMiddlewareConfig): Middleware => 
   return (store: MiddlewareAPI<AppDispatch>) => (next) => (action) => {
     const { type } = action as PayloadAction;
     if (type === actions.connect) {
-      // Закрываем старое соединение, если есть
       if (socket) {
         socket.close();
         socket = null;
@@ -34,9 +33,8 @@ export const socketMiddleware = (config: SocketMiddlewareConfig): Middleware => 
 
       if (requiresToken) {
         const { payload } = action as PayloadAction<string>;
-        token = payload; // ← присваиваем внешней переменной
+        token = payload;
 
-        // Очищаем токен от префикса "Bearer "
         if (token?.startsWith('Bearer ')) {
           token = token.replace('Bearer ', '');
         }
