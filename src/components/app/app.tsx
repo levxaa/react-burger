@@ -43,7 +43,8 @@ export const App = (): React.JSX.Element => {
     state: TLocationState | null;
   };
   const backgroundLocation = location.state?.backgroundLocation;
-
+  console.log(`location  ${location.pathname}`);
+  console.log(`backgroundLocation  ${backgroundLocation?.pathname}`);
   return (
     <div className={styles.app}>
       <AppHeader />
@@ -103,7 +104,14 @@ export const App = (): React.JSX.Element => {
         <Routes>
           <Route path="/ingredients/:id" element={<IngredientModal />} />
           <Route path="/feed/:id" element={<OrderModal />} />
-          <Route path="/profile/orders/:id" element={<OrderModal />} />
+          <Route
+            path="/profile/orders/:id"
+            element={
+              <ProtectedRoute>
+                <OrderModal />
+              </ProtectedRoute>
+            }
+          />
         </Routes>
       )}
     </div>
