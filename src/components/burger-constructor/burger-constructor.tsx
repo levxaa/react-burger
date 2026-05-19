@@ -113,7 +113,10 @@ export const BurgerConstructor = (): React.JSX.Element => {
     type: 'top' | 'bottom' | 'middle',
     text: string
   ): React.JSX.Element => (
-    <div className={`${styles.placeholder} ${type} ml-8 mr-8`}>
+    <div
+      className={`${styles.placeholder} ${type} ml-8 mr-8`}
+      data-testid={`constructor-bun-${type}-placeholder`}
+    >
       <span className="text text_type_main-default text_color_inactive">{text}</span>
     </div>
   );
@@ -123,6 +126,7 @@ export const BurgerConstructor = (): React.JSX.Element => {
       <section
         ref={dropRef as unknown as React.Ref<HTMLLIElement>}
         className={`${styles.burger_constructor} pl-4`}
+        data-testid="burger-constructor-drop-zone"
       >
         <div className="pl-8 pb-4 pr-4">
           {bun ? (
@@ -137,7 +141,10 @@ export const BurgerConstructor = (): React.JSX.Element => {
             renderIngredientsPlaceholder('top', 'Перетащите сюда булку')
           )}
         </div>
-        <ul className={`${styles.list} custom-scroll pl-4`}>
+        <ul
+          className={`${styles.list} custom-scroll pl-4`}
+          data-testid="constructor-ingredients-list"
+        >
           {constructorIngredients.length > 0
             ? constructorIngredients.map((item, index) => (
                 <DraggableIngredient
@@ -167,6 +174,7 @@ export const BurgerConstructor = (): React.JSX.Element => {
           <span className="text text_type_digits-default mr-2">{totalPrice}</span>
           <CurrencyIcon type="primary" className="mr-10" />
           <Button
+            data-testid="order-button"
             htmlType="submit"
             size="medium"
             type="primary"

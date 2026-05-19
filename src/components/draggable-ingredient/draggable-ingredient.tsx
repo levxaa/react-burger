@@ -71,6 +71,7 @@ export const DraggableIngredient = ({
       }}
       className={styles.list_item}
       style={{ opacity: isDragging ? 0.5 : 1 }}
+      data-testid="constructor-ingredient"
     >
       <DragIcon type="primary" />
       <ConstructorElement

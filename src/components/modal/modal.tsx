@@ -28,10 +28,11 @@ export const Modal = ({ header, children, onClose }: TModalProps): React.JSX.Ele
   }, [onClose]);
 
   return ReactDOM.createPortal(
-    <ModalOverlay onClick={onClose}>
+    <ModalOverlay onClick={onClose} data-testid="modal-overlay">
       <div
         className={`${styles.modal} pl-10 pt-10 pr-10 pb-15`}
         onClick={(e) => e.stopPropagation()}
+        data-testid="modal-dialog"
       >
         <div className={styles.modal_top}>
           <span className="text text_type_main-large">{header}</span>
