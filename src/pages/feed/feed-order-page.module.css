@@ -1,0 +1,12 @@
+.page {
+  display: flex;
+  justify-content: center;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 120px 40px 40px;
+}
+
+.content {
+  width: 100%;
+  max-width: 640px;
+}

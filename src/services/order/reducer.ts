@@ -1,4 +1,4 @@
-import { request } from '@/utils/api';
+import { fetchWithRefresh } from '@/utils/api';
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 
 type OrderState = {
@@ -22,7 +22,7 @@ export const createOrder = createAsyncThunk(
   'order/createOrder',
   async (ingredients: string[], { rejectWithValue }) => {
     try {
-      const response = await request<OrderResponse>(`/orders`, {
+      const response = await fetchWithRefresh<OrderResponse>(`/orders`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

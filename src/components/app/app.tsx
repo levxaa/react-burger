@@ -1,3 +1,4 @@
+import { FeedOrderPage } from '@/pages/feed/feed-order-page';
 import { FeedPage } from '@/pages/feed/feed-page';
 import { ForgotPasswordPage } from '@/pages/forms/forgot-password/forgot-password-page';
 import { LoginPage } from '@/pages/forms/login/login-page';
@@ -6,6 +7,7 @@ import { ResetPasswordPage } from '@/pages/forms/reset-password/reset-password-p
 import { Home } from '@/pages/home/home';
 import { IngredientPage } from '@/pages/ingredient-page/ingredient-page';
 import { NotFoundPage } from '@/pages/not-found/not-found-page';
+import { ProfileOrderInfoPage } from '@/pages/profile/orders/profile-order-info-page';
 import { ProfileOrderPage } from '@/pages/profile/orders/profile-order-page';
 import { ProfileForm } from '@/pages/profile/profile-form';
 import { ProfilePage } from '@/pages/profile/profile-page';
@@ -17,6 +19,7 @@ import { Routes, Route, useLocation } from 'react-router-dom';
 
 import { AppHeader } from '@components/app-header/app-header';
 import { IngredientModal } from '@components/ingredient-modal/ingredient-modal';
+import { OrderModal } from '@components/order-modal/order-modal';
 import { ProtectedRoute } from '@components/protected-route/protected-route';
 
 import styles from './app.module.css';
@@ -40,7 +43,8 @@ export const App = (): React.JSX.Element => {
     state: TLocationState | null;
   };
   const backgroundLocation = location.state?.backgroundLocation;
-
+  console.log(`location  ${location.pathname}`);
+  console.log(`backgroundLocation  ${backgroundLocation?.pathname}`);
   return (
     <div className={styles.app}>
       <AppHeader />
@@ -79,6 +83,7 @@ export const App = (): React.JSX.Element => {
           }
         />
         <Route path="/feed" element={<FeedPage />} />
+        <Route path="/feed/:id" element={<FeedOrderPage />} />
         <Route path="/ingredients/:id" element={<IngredientPage />} />
         <Route
           path="/profile"
@@ -90,6 +95,7 @@ export const App = (): React.JSX.Element => {
         >
           <Route index element={<ProfileForm />} />
           <Route path="orders" element={<ProfileOrderPage />} />
+          <Route path="orders/:id" element={<ProfileOrderInfoPage />} />
         </Route>
         <Route path="*" element={<NotFoundPage />} />
       </Routes>
@@ -97,6 +103,15 @@ export const App = (): React.JSX.Element => {
       {backgroundLocation && (
         <Routes>
           <Route path="/ingredients/:id" element={<IngredientModal />} />
+          <Route path="/feed/:id" element={<OrderModal />} />
+          <Route
+            path="/profile/orders/:id"
+            element={
+              <ProtectedRoute>
+                <OrderModal />
+              </ProtectedRoute>
+            }
+          />
         </Routes>
       )}
     </div>

@@ -4,8 +4,20 @@
   padding: 120px 40px 40px;
 }
 
-.placeholder {
-  padding: 60px 0;
-  color: var(--text-secondary-color);
-  text-align: center;
+.content {
+  display: flex;
+  gap: 60px;
+}
+
+.ordersList {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 16px;
+  max-height: 900px;
+  overflow-y: auto;
+}
+
+.stats {
+  width: 580px;
 }
