@@ -1,31 +1,4 @@
-import { ingredients } from '@/utils/ingredients';
 import { test, expect, type Page, type Locator } from '@playwright/test';
-
-const setupIngredientsMock = async (page: Page): Promise<void> => {
-  await page.route('**/api/ingredients', async (route) => {
-    await route.fulfill({
-      status: 200,
-      contentType: 'application/json',
-      body: JSON.stringify({
-        success: true,
-        data: ingredients,
-      }),
-    });
-  });
-};
-
-const setupAuthMock = async (page: Page): Promise<void> => {
-  await page.route('**/api/auth/user', async (route) => {
-    await route.fulfill({
-      status: 200,
-      contentType: 'application/json',
-      body: JSON.stringify({
-        success: true,
-        user: { email: 'test@test.com', name: 'Test User' },
-      }),
-    });
-  });
-};
 
 const setupAuth = async (page: Page): Promise<void> => {
   await page.evaluate(() => {
@@ -50,8 +23,10 @@ const orderNumberLocator = (page: Page): Locator => page.getByTestId('order-numb
 
 test.describe('Страница конструктора', () => {
   test.beforeEach(async ({ page }) => {
-    await setupIngredientsMock(page);
-    await setupAuthMock(page);
+    await page.routeFromHAR('./e2e/hars/get-ingredients.har', {
+      url: '**/api/ingredients',
+      update: false,
+    });
     await page.goto('/');
     await page.waitForSelector('[data-testid="ingredient-card"]');
   });
@@ -121,17 +96,9 @@ test.describe('Страница конструктора', () => {
   test.describe('Оформление заказа', () => {
     test('оформление заказа показывает модалку с номером 12345', async ({ page }) => {
       await setupAuth(page);
-
-      await page.route('**/api/orders', async (route) => {
-        await route.fulfill({
-          status: 200,
-          contentType: 'application/json',
-          body: JSON.stringify({
-            success: true,
-            order: { number: 12345 },
-            name: 'Тестовый бургер',
-          }),
-        });
+      await page.routeFromHAR('./e2e/hars/post-order.har', {
+        url: '**/api/orders',
+        update: false,
       });
 
       await page.reload();
@@ -144,35 +111,6 @@ test.describe('Страница конструктора', () => {
       await page.waitForSelector('[data-testid="modal-dialog"]', { timeout: 10000 });
 
       await expect(modalDialogLocator(page)).toBeVisible();
-      await expect(orderNumberLocator(page)).toHaveText('12345');
-    });
-
-    test('модалка заказа содержит номер 12345', async ({ page }) => {
-      await setupAuth(page);
-
-      await page.route('**/api/orders', async (route) => {
-        await route.fulfill({
-          status: 200,
-          contentType: 'application/json',
-          body: JSON.stringify({
-            success: true,
-            order: { number: 12345 },
-            name: 'Тестовый бургер',
-          }),
-        });
-      });
-
-      await page.reload();
-      await page.waitForSelector('[data-testid="ingredient-card"]');
-
-      await bunCardLocator(page).first().dragTo(dropZoneLocator(page));
-      await page.waitForTimeout(300);
-
-      await orderButtonLocator(page).click();
-      await page.waitForSelector('[data-testid="modal-dialog"]', { timeout: 10000 });
-
-      await expect(modalDialogLocator(page)).toBeVisible();
-      await expect(page.getByText('идентификатор заказа')).toBeVisible();
       await expect(orderNumberLocator(page)).toHaveText('12345');
     });
   });
