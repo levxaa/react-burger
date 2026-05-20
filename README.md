@@ -36,4 +36,5 @@
 		'@utils': path.resolve(__dirname, './src/utils'),
 	},
 ```
-to do merge request
+deploy
+https://levxaa.github.io/react-burger/#/
