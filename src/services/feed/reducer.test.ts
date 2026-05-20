@@ -2,6 +2,7 @@ import { describe, it, expect } from 'vitest';
 
 import {
   feedSlice,
+  initialState,
   connect,
   disconnect,
   onOpen,
@@ -13,14 +14,6 @@ import {
 import type { TOrdersResponse } from '@utils/types';
 
 describe('feed reducer', () => {
-  const initialState = {
-    orders: [],
-    total: 0,
-    totalToday: 0,
-    isConnected: false,
-    error: null,
-  };
-
   it('should return initial state', () => {
     expect(feedSlice.reducer(undefined, { type: 'unknown' })).toEqual(initialState);
   });

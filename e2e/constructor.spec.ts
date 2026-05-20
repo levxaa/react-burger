@@ -1,13 +1,20 @@
-import { test, expect } from '@playwright/test';
+import { ingredients } from '@/utils/ingredients';
+import { test, expect, type Page, type Locator } from '@playwright/test';
 
-import type { Page } from '@playwright/test';
+const setupIngredientsMock = async (page: Page): Promise<void> => {
+  await page.route('**/api/ingredients', async (route) => {
+    await route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify({
+        success: true,
+        data: ingredients,
+      }),
+    });
+  });
+};
 
 const setupAuthMock = async (page: Page): Promise<void> => {
-  await page.evaluate(() => {
-    localStorage.setItem('accessToken', 'Bearer mock-access-token');
-    localStorage.setItem('refreshToken', 'mock-refresh-token');
-  });
-
   await page.route('**/api/auth/user', async (route) => {
     await route.fulfill({
       status: 200,
@@ -20,8 +27,31 @@ const setupAuthMock = async (page: Page): Promise<void> => {
   });
 };
 
+const setupAuth = async (page: Page): Promise<void> => {
+  await page.evaluate(() => {
+    localStorage.setItem('accessToken', 'Bearer mock-access-token');
+    localStorage.setItem('refreshToken', 'mock-refresh-token');
+  });
+};
+
+const ingredientCardLocator = (page: Page): Locator =>
+  page.getByTestId('ingredient-card');
+const bunCardLocator = (page: Page): Locator =>
+  page.locator('[data-testid="ingredient-card"][data-ingredient-type="bun"]');
+const mainCardLocator = (page: Page): Locator =>
+  page.locator('[data-testid="ingredient-card"][data-ingredient-type="main"]');
+const dropZoneLocator = (page: Page): Locator =>
+  page.getByTestId('burger-constructor-drop-zone');
+const orderButtonLocator = (page: Page): Locator => page.getByTestId('order-button');
+const modalDialogLocator = (page: Page): Locator => page.getByTestId('modal-dialog');
+const bunPlaceholderLocator = (page: Page): Locator =>
+  page.getByTestId('constructor-bun-top-placeholder');
+const orderNumberLocator = (page: Page): Locator => page.getByTestId('order-number');
+
 test.describe('Страница конструктора', () => {
   test.beforeEach(async ({ page }) => {
+    await setupIngredientsMock(page);
+    await setupAuthMock(page);
     await page.goto('/');
     await page.waitForSelector('[data-testid="ingredient-card"]');
   });
@@ -32,85 +62,65 @@ test.describe('Страница конструктора', () => {
     });
 
     test('отображает список ингредиентов', async ({ page }) => {
-      await expect(page.getByTestId('ingredient-card').first()).toBeVisible();
-      const count = await page.getByTestId('ingredient-card').count();
+      await expect(ingredientCardLocator(page).first()).toBeVisible();
+      const count = await ingredientCardLocator(page).count();
       expect(count).toBeGreaterThan(0);
     });
 
     test('конструктор пустой с плейсхолдерами', async ({ page }) => {
-      await expect(page.getByTestId('burger-constructor-drop-zone')).toBeVisible();
-      await expect(page.getByTestId('constructor-bun-top-placeholder')).toBeVisible();
+      await expect(dropZoneLocator(page)).toBeVisible();
+      await expect(bunPlaceholderLocator(page)).toBeVisible();
     });
   });
 
   test.describe('Кнопка заказа', () => {
     test('кнопка "Оформить заказ" disabled без булки', async ({ page }) => {
-      await expect(page.getByTestId('order-button')).toBeDisabled();
+      await expect(orderButtonLocator(page)).toBeDisabled();
     });
   });
 
   test.describe('Модалка ингредиента', () => {
     test('клик на ингредиент открывает модалку', async ({ page }) => {
-      await page.getByTestId('ingredient-card').first().click();
-      await expect(page.getByTestId('modal-dialog')).toBeVisible();
+      await ingredientCardLocator(page).first().click();
+      await expect(modalDialogLocator(page)).toBeVisible();
     });
 
     test('Escape закрывает модалку', async ({ page }) => {
-      await page.getByTestId('ingredient-card').first().click();
-      await expect(page.getByTestId('modal-dialog')).toBeVisible();
+      await ingredientCardLocator(page).first().click();
+      await expect(modalDialogLocator(page)).toBeVisible();
       await page.keyboard.press('Escape');
-      await expect(page.getByTestId('modal-dialog')).not.toBeVisible();
+      await expect(modalDialogLocator(page)).not.toBeVisible();
     });
   });
 
   test.describe('Drag and Drop', () => {
     test('перетаскивание булки в конструктор', async ({ page }) => {
-      const bun = page
-        .locator('[data-testid="ingredient-card"][data-ingredient-type="bun"]')
-        .first();
-      const dropZone = page.getByTestId('burger-constructor-drop-zone');
+      await expect(bunPlaceholderLocator(page)).toBeVisible();
 
-      await expect(page.getByTestId('constructor-bun-top-placeholder')).toBeVisible();
+      await bunCardLocator(page).first().dragTo(dropZoneLocator(page));
 
-      await bun.dragTo(dropZone);
-
-      await expect(
-        page.getByTestId('constructor-bun-top-placeholder')
-      ).not.toBeVisible();
+      await expect(bunPlaceholderLocator(page)).not.toBeVisible();
     });
 
     test('перетаскивание начинки в конструктор', async ({ page }) => {
-      const bun = page
-        .locator('[data-testid="ingredient-card"][data-ingredient-type="bun"]')
-        .first();
-      const dropZone = page.getByTestId('burger-constructor-drop-zone');
-      await bun.dragTo(dropZone);
-
-      const mainIngredient = page
-        .locator('[data-testid="ingredient-card"][data-ingredient-type="main"]')
-        .first();
-      await mainIngredient.dragTo(dropZone);
+      await bunCardLocator(page).first().dragTo(dropZoneLocator(page));
+      await mainCardLocator(page).first().dragTo(dropZoneLocator(page));
 
       await expect(page.getByTestId('constructor-ingredient')).toHaveCount(1);
     });
 
     test('кнопка заказа активируется после добавления булки', async ({ page }) => {
-      const orderButton = page.getByTestId('order-button');
-      await expect(orderButton).toBeDisabled();
+      await expect(orderButtonLocator(page)).toBeDisabled();
 
-      const bun = page
-        .locator('[data-testid="ingredient-card"][data-ingredient-type="bun"]')
-        .first();
-      const dropZone = page.getByTestId('burger-constructor-drop-zone');
-      await bun.dragTo(dropZone);
+      await bunCardLocator(page).first().dragTo(dropZoneLocator(page));
 
-      await expect(orderButton).toBeEnabled();
+      await expect(orderButtonLocator(page)).toBeEnabled();
     });
   });
 
   test.describe('Оформление заказа', () => {
-    test('оформление заказа показывает модалку с номером', async ({ page }) => {
-      await setupAuthMock(page);
+    test('оформление заказа показывает модалку с номером 12345', async ({ page }) => {
+      await setupAuth(page);
 
       await page.route('**/api/orders', async (route) => {
         await route.fulfill({
@@ -127,28 +137,18 @@ test.describe('Страница конструктора', () => {
       await page.reload();
       await page.waitForSelector('[data-testid="ingredient-card"]');
 
-      const bun = page
-        .locator('[data-testid="ingredient-card"][data-ingredient-type="bun"]')
-        .first();
-      const dropZone = page.getByTestId('burger-constructor-drop-zone');
-      await bun.dragTo(dropZone);
-
+      await bunCardLocator(page).first().dragTo(dropZoneLocator(page));
       await page.waitForTimeout(300);
 
-      const orderButton = page.getByTestId('order-button');
-      await expect(orderButton).toBeEnabled();
-
-      await orderButton.click();
-
+      await orderButtonLocator(page).click();
       await page.waitForSelector('[data-testid="modal-dialog"]', { timeout: 10000 });
-      await expect(page.getByTestId('modal-dialog')).toBeVisible();
-      await expect(page.locator('[class*="text_type_digits-large"]')).toContainText(
-        /\d+/
-      );
+
+      await expect(modalDialogLocator(page)).toBeVisible();
+      await expect(orderNumberLocator(page)).toHaveText('12345');
     });
 
-    test('модалка заказа содержит текст об идентификаторе', async ({ page }) => {
-      await setupAuthMock(page);
+    test('модалка заказа содержит номер 12345', async ({ page }) => {
+      await setupAuth(page);
 
       await page.route('**/api/orders', async (route) => {
         await route.fulfill({
@@ -156,7 +156,7 @@ test.describe('Страница конструктора', () => {
           contentType: 'application/json',
           body: JSON.stringify({
             success: true,
-            order: { number: 67890 },
+            order: { number: 12345 },
             name: 'Тестовый бургер',
           }),
         });
@@ -165,22 +165,15 @@ test.describe('Страница конструктора', () => {
       await page.reload();
       await page.waitForSelector('[data-testid="ingredient-card"]');
 
-      const bun = page
-        .locator('[data-testid="ingredient-card"][data-ingredient-type="bun"]')
-        .first();
-      const dropZone = page.getByTestId('burger-constructor-drop-zone');
-      await bun.dragTo(dropZone);
-
+      await bunCardLocator(page).first().dragTo(dropZoneLocator(page));
       await page.waitForTimeout(300);
 
-      const orderButton = page.getByTestId('order-button');
-      await expect(orderButton).toBeEnabled();
-
-      await orderButton.click();
-
+      await orderButtonLocator(page).click();
       await page.waitForSelector('[data-testid="modal-dialog"]', { timeout: 10000 });
-      await expect(page.getByTestId('modal-dialog')).toBeVisible();
+
+      await expect(modalDialogLocator(page)).toBeVisible();
       await expect(page.getByText('идентификатор заказа')).toBeVisible();
+      await expect(orderNumberLocator(page)).toHaveText('12345');
     });
   });
 });

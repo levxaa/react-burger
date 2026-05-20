@@ -10,7 +10,7 @@ type ConstructorState = {
   bun: TIngredient | undefined;
   ingredients: ConstructorIngredient[];
 };
-const initialState: ConstructorState = {
+export const initialState: ConstructorState = {
   bun: undefined,
   ingredients: [],
 };

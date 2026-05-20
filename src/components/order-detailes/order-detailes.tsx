@@ -17,7 +17,9 @@ export const OrderDetailes = ({
 
   return (
     <div className={`${styles.info}`}>
-      <span className="text text_type_digits-large mb-8">{orderNumber}</span>
+      <span className="text text_type_digits-large mb-8" data-testid="order-number">
+        {orderNumber}
+      </span>
       <span className="text text_type_main-medium">идентификатор заказа</span>
       <div>
         <CheckMarkIcon type="primary" className="mt-15 mb-15" />

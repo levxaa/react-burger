@@ -1,14 +1,8 @@
 import { describe, it, expect } from 'vitest';
 
-import ingredientsReducer, { fetchIngredients } from './reducer';
+import ingredientsReducer, { fetchIngredients, initialState } from './reducer';
 
 describe('ingredients reducer', () => {
-  const initialState = {
-    ingredients: [],
-    loading: false,
-    error: null,
-  };
-
   it('should return initial state', () => {
     expect(ingredientsReducer(undefined, { type: 'unknown' })).toEqual(initialState);
   });

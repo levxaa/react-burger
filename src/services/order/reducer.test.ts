@@ -1,14 +1,8 @@
 import { describe, it, expect } from 'vitest';
 
-import orderReducer, { createOrder, clearOrder } from './reducer';
+import orderReducer, { createOrder, clearOrder, initialState } from './reducer';
 
 describe('order reducer', () => {
-  const initialState = {
-    order: null,
-    loading: false,
-    error: null,
-  };
-
   it('should return initial state', () => {
     expect(orderReducer(undefined, { type: 'unknown' })).toEqual(initialState);
   });

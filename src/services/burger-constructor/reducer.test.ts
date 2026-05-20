@@ -7,46 +7,42 @@ import {
   removeIngredient,
   moveIngredient,
   clearConstructor,
+  initialState,
 } from './reducer';
 
 import type { TIngredient } from '@utils/types';
 
+const mockBun: TIngredient = {
+  _id: 'bun-id',
+  name: 'Булка',
+  type: 'bun',
+  proteins: 10,
+  fat: 5,
+  carbohydrates: 30,
+  calories: 100,
+  price: 50,
+  image: 'bun.png',
+  image_large: 'bun-large.png',
+  image_mobile: 'bun-mobile.png',
+  __v: 0,
+};
+
+const mockIngredient: TIngredient = {
+  _id: 'ingredient-id',
+  name: 'Котлета',
+  type: 'main',
+  proteins: 20,
+  fat: 15,
+  carbohydrates: 10,
+  calories: 200,
+  price: 100,
+  image: 'cutlet.png',
+  image_large: 'cutlet-large.png',
+  image_mobile: 'cutlet-mobile.png',
+  __v: 0,
+};
+
 describe('burgerConstructor reducer', () => {
-  const initialState = {
-    bun: undefined,
-    ingredients: [],
-  };
-
-  const mockBun: TIngredient = {
-    _id: 'bun-id',
-    name: 'Булка',
-    type: 'bun',
-    proteins: 10,
-    fat: 5,
-    carbohydrates: 30,
-    calories: 100,
-    price: 50,
-    image: 'bun.png',
-    image_large: 'bun-large.png',
-    image_mobile: 'bun-mobile.png',
-    __v: 0,
-  };
-
-  const mockIngredient: TIngredient = {
-    _id: 'ingredient-id',
-    name: 'Котлета',
-    type: 'main',
-    proteins: 20,
-    fat: 15,
-    carbohydrates: 10,
-    calories: 200,
-    price: 100,
-    image: 'cutlet.png',
-    image_large: 'cutlet-large.png',
-    image_mobile: 'cutlet-mobile.png',
-    __v: 0,
-  };
-
   it('should return initial state', () => {
     expect(constructorSlice.reducer(undefined, { type: 'unknown' })).toEqual(
       initialState

@@ -1,15 +1,11 @@
 import { describe, it, expect } from 'vitest';
 
 import { selectIngredient, clearIngredient } from './actions';
-import ingredientReducer from './reducer';
+import ingredientReducer, { initialState } from './reducer';
 
 import type { TIngredient } from '@utils/types';
 
 describe('selectedIngredient reducer', () => {
-  const initialState = {
-    selectedIngredient: undefined,
-  };
-
   const mockIngredient: TIngredient = {
     _id: 'ingredient-1',
     name: 'Булка',

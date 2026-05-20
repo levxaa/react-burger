@@ -11,7 +11,7 @@ type UserOrdersState = {
   error: string | null;
 };
 
-const initialState: UserOrdersState = {
+export const initialState: UserOrdersState = {
   orders: [],
   total: 0,
   totalToday: 0,

@@ -8,16 +8,10 @@ import {
   checkAuth,
   updateUser,
   clearError,
+  initialState,
 } from './reducer';
 
 describe('auth reducer', () => {
-  const initialState = {
-    user: null,
-    isAuth: false,
-    isLoading: false,
-    error: null,
-  };
-
   beforeEach(() => {
     localStorage.clear();
   });
