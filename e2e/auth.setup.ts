@@ -1,6 +1,6 @@
 import { test as setup } from '@playwright/test';
 
-import type { TAuthResponse } from '../src/utils/api';
+import type { TAuthResponse } from '@/utils/api';
 
 const authFile = 'e2e/.auth/user.json';
 

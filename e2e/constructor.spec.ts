@@ -152,21 +152,16 @@ test.describe('Страница конструктора', () => {
 
   test.describe('Оформление заказа', () => {
     test('оформление заказа показывает модалку с номером 1051', async ({ page }) => {
-      // Добавляем булку
       await bunCardLocator(page).first().dragTo(dropZoneLocator(page));
       await page.waitForTimeout(500);
 
-      // Добавляем ингредиент
       await mainCardLocator(page).first().dragTo(dropZoneLocator(page));
-      await page.waitForTimeout(300);
 
-      // Проверяем кнопку
+      await page.waitForTimeout(300);
       await expect(orderButtonLocator(page)).toBeEnabled();
 
-      // Оформляем заказ
       await orderButtonLocator(page).click();
       //  await page.waitForResponse('**/api/orders', { timeout: 10000 });
-      // Проверяем модальное окно
       await expect(modalDialogLocator(page)).toBeVisible({ timeout: 10000 });
       await expect(orderNumberLocator(page)).toBeVisible();
 
