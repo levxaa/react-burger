@@ -2,11 +2,12 @@ import { test, expect, type Page, type Locator } from '@playwright/test';
 
 const ingredientCardLocator = (page: Page): Locator =>
   page.getByTestId('ingredient-card');
-const ingredientLocator = (page: Page, type: string): Locator =>
-  page.locator(`[data-testid="ingredient-card"][data-ingredient-type="${type}"]`);
-const bunCardLocator = (page: Page): Locator => ingredientLocator(page, 'bun');
-const mainCardLocator = (page: Page): Locator => ingredientLocator(page, 'main');
-const sauceCardLocator = (page: Page): Locator => ingredientLocator(page, 'sauce');
+const bunCardLocator = (page: Page): Locator =>
+  page.locator('[data-testid="ingredient-card"][data-ingredient-type="bun"]');
+const mainCardLocator = (page: Page): Locator =>
+  page.locator('[data-testid="ingredient-card"][data-ingredient-type="main"]');
+const sauceCardLocator = (page: Page): Locator =>
+  page.locator('[data-testid="ingredient-card"][data-ingredient-type="sauce"]');
 const dropZoneLocator = (page: Page): Locator =>
   page.getByTestId('burger-constructor-drop-zone');
 const orderButtonLocator = (page: Page): Locator => page.getByTestId('order-button');
