@@ -11,7 +11,7 @@ type IngredientsResponse = {
   success: boolean;
   data: TIngredient[];
 };
-const initialState: IngredientsState = {
+export const initialState: IngredientsState = {
   ingredients: [],
   loading: false,
   error: null,

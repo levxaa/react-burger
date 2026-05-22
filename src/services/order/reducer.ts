@@ -12,7 +12,7 @@ type OrderResponse = {
   order: { number: number };
   name: string;
 };
-const initialState: OrderState = {
+export const initialState: OrderState = {
   order: null,
   loading: false,
   error: null,

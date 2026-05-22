@@ -8,7 +8,7 @@ type IngredientState = {
   selectedIngredient: TIngredient | undefined;
 };
 
-const initialState: IngredientState = {
+export const initialState: IngredientState = {
   selectedIngredient: undefined,
 };
 
